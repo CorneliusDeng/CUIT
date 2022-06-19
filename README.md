@@ -13,4 +13,3 @@ All sourcecode in CUIT
 - JavaWeb
 - Python
 - SpringBoot
-- Vue3
