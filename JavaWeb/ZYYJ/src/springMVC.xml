@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+	
+	<!-- 组件扫描 -->
+	<context:component-scan base-package="com.zyyj"></context:component-scan>
+	
+	<!-- 开启注解驱动 -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+	
+	<!-- 视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- 数据源，druid数据库连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" scope="singleton">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://182.92.116.152:3306/db_zyyj?characterEncoding=UTF-8"/>
+		<property name="username" value="root"/>
+		<property name="password" value="12345678"/>
+		
+		<property name="initialSize" value="5"/>    <!-- 初始连接池数量 -->
+		<property name="maxActive" value="20"/>     <!-- 最大同时并发连接数，20 -->
+		<property name="removeAbandoned" value="true"/>  <!-- 关闭闲置连接 -->
+		<property name="minEvictableIdleTimeMillis" value="100000"/> <!-- 连接最短存在时间，30s -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>  <!-- 闲置连接最大存在时间，60s -->
+		
+	</bean>
+	
+	<!-- 声明事务管理器 -->
+	<bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- mybatis 操作数据库的会话对象，sqlsession -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>      <!-- mybatis配置文件路径 -->
+		<property name="typeAliasesPackage" value="com.zyyj.bean"/>                 <!-- 设置类型别名 -->
+		<property name="mapperLocations" value="classpath:com/zyyj/mapper/*/*.xml"/>  <!-- 设置数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- 为指定包下面的mapper接口生成动态代理类，使其可以被spring自动装配 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zyyj.mapper"/>
+	</bean>
+</beans>

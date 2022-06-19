@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.exam.StudentExamMapper">
+
+	<!-- List<StudentExam> getAllStudentExams(); -->
+	<select id="getAllStudentExams" resultType="StudentExam">
+		select p.practice_id, s.name as stu_name, e.name as exam_name, p.status, p.createtime, p.score, c.name as course_name  from zyyj_student_practice as p, zyyj_student as s, zyyj_course as c, zyyj_exam as e where p.stu_id=s.stu_id and p.course_id=c.course_id
+		and p.exam_id=e.exam_id and p.programme_id is null
+	</select>
+	
+	<!-- List<StudentExam> searchByStudent(String stuName); -->
+	<select id="searchByStudent" resultType="StudentExam">
+		select p.practice_id, s.name as stu_name, e.name as exam_name, p.status, p.createtime, p.score, c.name as course_name 
+		from zyyj_student_practice as p, zyyj_student as s, zyyj_course as c, zyyj_exam as e 
+		where p.course_id=c.course_id and p.exam_id=e.exam_id and p.programme_id is null and p.stu_id=s.stu_id and s.name like #{stuName};
+	</select>
+	
+	<!-- List<StudentExam> searchByClass(String className); -->
+	<select id="searchByClass" resultType="StudentExam">
+		select p.practice_id, s.name as stu_name, e.name as exam_name, p.status, p.createtime, p.score, c.name as course_name 
+		from zyyj_student_practice as p, zyyj_student as s, zyyj_course as c, zyyj_exam as e, zyyj_class as cls  
+		where p.course_id=c.course_id and p.exam_id=e.exam_id and p.programme_id is null and s.class_id=cls.class_id and s.stu_id=p.stu_id and cls.name like #{className};
+	</select>
+	
+	<select id="searchByExam" resultType="StudentExam">
+		select p.practice_id, s.name as stu_name, e.name as exam_name, p.status, p.createtime, p.score, c.name as course_name  
+		from zyyj_student_practice as p, zyyj_student as s, zyyj_course as c, zyyj_exam as e 
+		where p.stu_id=s.stu_id and p.course_id=c.course_id
+		and p.exam_id=e.exam_id and p.programme_id is null and e.name like #{exam_name}
+	</select>
+	
+	<delete id="deleteStudentExam">
+		DELETE FROM zyyj_student_practice 
+		WHERE exam_id=#{exam_id}
+	</delete>
+</mapper>

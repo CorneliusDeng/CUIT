@@ -1,0 +1,1 @@
+<% response.sendRedirect(request.getContextPath()+"/student/student_list_action.jsp"); %>

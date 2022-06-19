@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dateornotbackend.mapper.BlogMapper">
+
+    <delete id="DeleteBlog">
+        delete from Blog where blog_id = #{blog_id}
+    </delete>
+
+    <update id="UpdateBlog" parameterType="com.dateornotbackend.entity.Blog">
+        update Blog set state = 0
+        where blog_id = #{blog_id}
+    </update>
+
+    <select id="QueryBlog" resultType="com.dateornotbackend.entity.Blog">
+        select blog_id, user_id, thumbs_up, release_time, state, text_content, comments_num from Blog
+    </select>
+
+
+    <select id="DetailBlog" resultType="com.dateornotbackend.entity.Blog">
+        select blog_id, user_id, thumbs_up, release_time, state, text_content, comments_num from Blog where blog_id = #{blog_id}
+    </select>
+
+    <select id="BlogImages" resultType="java.lang.String">
+        select link from BlogImage where blog_id = #{blog_id}
+    </select>
+
+</mapper>

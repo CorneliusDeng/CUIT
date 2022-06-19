@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.practice.PracticeProgrammeMapper">
+
+	<!-- List<PracticeProgramme> getAllPracticeProgrammes(); -->
+	<select id="getAllPracticeProgrammes" resultType="PracticeProgramme">
+		select prog.programme_id, prog.name, u.realname as creator, prog.createdate, prog.score, c.name as course, prog.comment as note
+		from zyyj_programme as prog, zyyj_course as c, zyyj_course_programme as cp, zyyj_user as u, zyyj_practice_record as r 
+		where c.course_id=cp.course_id and prog.programme_id=cp.programme_id and u.user_id=r.user_id and r.programme_id=prog.programme_id;
+	</select>
+	
+	<!-- List<String> getAllCourses(); -->
+	<select id="getAllCourses" resultType="String">
+		select name from zyyj_course;
+	</select>
+	
+	<!-- String getMaxId() -->
+	<select id="getMaxId" resultType="String">
+		select max(programme_id) from zyyj_programme;
+	</select>
+	
+	<!-- 添加 -->
+	<!-- int addPracticeProgramme(PracticeProgramme programme); -->
+	<insert id="addPracticeProgramme">
+		insert zyyj_programme values(#{programme_id}, #{name}, #{createdate}, #{score}, #{note});
+	</insert>
+	<!-- int addCourseProgramme(String course, String programme_id); -->
+	<insert id="addCourseProgramme">
+		insert zyyj_course_programme values((select course_id from zyyj_course where name=#{course}), #{programme_id});
+	</insert>
+	<!-- int addPracticeRecord(PracticeProgramme programme) -->
+	<insert id="addPracticeRecord">
+		insert zyyj_practice_record values((select user_id from zyyj_user where realname=#{creator}), #{programme_id});
+	</insert>
+	
+	
+	<!-- 修改 -->
+	<!-- int updatePracticeProgramme(PracticeProgramme programme); -->
+	<update id="updatePracticeProgramme">
+		update zyyj_programme set name=#{name}, score=#{score}, comment=#{note} where programme_id=#{programme_id};
+	</update>
+	<!-- int updateCourseProgramme(PracticeProgramme programme); -->
+	<update id="updateCourseProgramme">
+		update zyyj_course_programme set course_id = (select course_id from zyyj_course where name=#{course}) where programme_id=#{programme_id};
+	</update>
+	
+	<!-- 删除 -->
+	<!-- int deletePracticeRecord(String programme_id); -->	
+	<delete id="deletePracticeRecord">
+		delete from zyyj_practice_record where programme_id=#{programme_id};
+	</delete>
+	<!-- int deleteCourseProgramme(String programme_id); -->
+	<delete id="deleteCourseProgramme">
+		delete from zyyj_course_programme where programme_id=#{programme_id};
+	</delete>
+	<!-- int deletePracticeProgramme(String programme_id); -->
+	<delete id="deletePracticeProgramme">
+		delete from zyyj_programme where programme_id=#{programme_id};
+	</delete>
+	
+	<!-- PracticeProgramme getPracticeProgramme(String programme_id); -->
+	<select id="getPracticeProgramme" resultType="PracticeProgramme">
+		select prog.programme_id, prog.name, u.realname as creator, prog.createdate, prog.score, c.name as course, prog.comment as note
+		from zyyj_programme as prog, zyyj_course as c, zyyj_course_programme as cp, zyyj_user as u, zyyj_practice_record as r 
+		where c.course_id=cp.course_id and prog.programme_id=cp.programme_id and u.user_id=r.user_id and r.programme_id=prog.programme_id and prog.programme_id=#{programme_id};
+	</select>
+	
+	<!-- List<PracticeProgramme> searchByName(String name); -->
+	<select id="searchByName" resultType="PracticeProgramme">
+		select prog.programme_id, prog.name, u.realname as creator, prog.createdate, prog.score, c.name as course, prog.comment as note
+		from zyyj_programme as prog, zyyj_course as c, zyyj_course_programme as cp, zyyj_user as u, zyyj_practice_record as r 
+		where c.course_id=cp.course_id and prog.programme_id=cp.programme_id and u.user_id=r.user_id and r.programme_id=prog.programme_id 
+		and prog.name like #{name};
+	</select>
+	<!-- List<PracticeProgramme> searchByCourse(String course); -->
+	<select id="searchByCourse" resultType="PracticeProgramme">
+		select prog.programme_id, prog.name, u.realname as creator, prog.createdate, prog.score, c.name as course, prog.comment as note
+		from zyyj_programme as prog, zyyj_course as c, zyyj_course_programme as cp, zyyj_user as u, zyyj_practice_record as r 
+		where c.course_id=cp.course_id and prog.programme_id=cp.programme_id and u.user_id=r.user_id and r.programme_id=prog.programme_id 
+		and c.name like #{course};
+	</select>
+	
+</mapper>

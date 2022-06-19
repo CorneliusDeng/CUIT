@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- 微信 JS-SDK  -->
+	<script type="text/javascript" src="//res.wx.qq.com/open/js/jweixin-1.4.0.js"></script> 
+	<!-- uni 的 SDK -->
+	<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+	<!-- vue开发环境版本，包含了有帮助的命令行警告 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+	<div id='container' class="container">
+		<div class="video-box" id="video-box">
+			<video id="remote-video" autoplay></video>
+			<video id="local-video"  muted autoplay></video>
+			<!-- <button class="start-button" onclick="">start</button> -->
+		</div>
+		<image id='closeBut' class="closeBut" src="../../static/images/message/closeTalk.png" ></image>
+	</div>
+	<script>
+		 new Vue ({
+			el:'#container',
+		    data:{
+				target:'',
+				localVideo: "本地视频窗",
+				remoteVideo: "远程视频窗",
+				agent:'',
+				
+				socketTask:null,
+				socketIsOpen:false,
+				socketUrl:"ws://119.23.49.121:8081/ws?uid=",
+				
+				webRTCisOpen:false,
+				peer:'',
+				stream:'',
+				ice:'',
+		    },
+		    mounted() {
+				this.localVideo=document.querySelector('#local-video');
+				this.remoteVideo=document.querySelector('#remote-video');
+				this.agent = this.urlParamGet(window.location.href);
+				this.target = this.agent.type;
+				if(Number(this.agent.uid)<=7000000){
+					this.agent.uid = Number(this.agent.uid)+7000000;
+				}
+				this.socketIsOpen = false;
+				this.socketUrl = this.socketUrl+this.agent.uid;
+				console.log(this.socketUrl);
+				// 待触发 `UniAppJSBridgeReady` 事件后，即可调用 uni 的 API。
+				document.addEventListener('UniAppJSBridgeReady', function() {
+				    uni.postMessage({
+				        data: {
+				            action: 'message',
+				        }
+				    });
+				});
+				let that = this;
+				//绑定挂机事件
+				document.querySelector('.closeBut').addEventListener('click', function(evt){
+					that.sendMessage("📞 拒绝通话");
+					uni.navigateTo({
+					    url: '/pages/message/friendChat?id='+(Number(that.agent.accepter)-7000000)
+					});
+					that.freeResource(); //释放资源
+				});
+				//初始化websocket
+				this.WebSocketInit();
+				//初始化webrtc
+				this.peerConnectionInit();
+				
+				this.localVideo.onloadeddata = () => {
+					console.log('播放本地视频');
+					this.localVideo.play();
+					
+				}
+				this.remoteVideo.onloadeddata = () => {
+					console.log('播放对方视频');
+					this.remoteVideo.play();
+				}
+			},
+			beforeDestroy() {
+				//关闭websocket
+				this.socketTask.close();
+				this.freeResource(); //释放资源
+			},
+			watch:{
+				socketIsOpen(val){
+					if(val==true&&this.webRTCisOpen==false){
+						if(this.target==='offer'){
+							console.log("开始连接");
+							this.startLive();
+						}else if(this.target==='answer'){
+							console.log("发起通话请求");
+							this.sendMessage("📞 视频通话");
+						}
+					}
+				}
+			},
+		    methods: {
+				//内网穿透服务器配置，突破局域网视频通话
+				iceNetPassInit:function(){
+					var ice = {"iceServers": [
+					    {"url": "stun:stun.l.google.com:19302"},  // 无需密码的stun服务器
+					    // TURN 一般需要自己去定义
+					    {
+					      'url': 'turn:192.158.29.39:3478?transport=udp',
+					      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', // 密码
+					      'username': '28224511:1379330808' // 用户名
+					    },
+					    {
+					      'url': 'turn:192.158.29.39:3478?transport=tcp',
+					      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					      'username': '28224511:1379330808'
+					    }
+					  ]};
+					return ice;
+				},
+				//建立websocket连接
+				WebSocketInit:function(){
+					console.log("尝试建立websocket连接");
+					//防止重复连接
+					if(this.socketIsOpen){return}
+					//连接websocket
+					this.socketTask = new WebSocket(this.socketUrl);
+					//监听开启
+					this.socketTask.onopen=()=>{
+						console.log("websocket已连接");
+						this.socketIsOpen = true;
+					};
+					//监听关闭
+					this.socketTask.onclose=()=>{
+						console.log("连接已关闭");
+						this.socketIsOpen = false;
+					};					
+					//监听错误
+					this.socketTask.onerror=()=>{
+						console.log("出错了");
+						this.socketIsOpen = false;
+					};					
+					//监听消息
+					this.socketTask.onmessage=(e)=>{
+						let msg = JSON.parse(e.data).msg;
+						console.log('视频通话客户端收到：'+msg);
+						if(msg=="📞 拒绝通话"){
+							this.closeChat();	//调用通话结束处理
+						}else{
+							this.handShake(msg);	//调用握手处理
+						}
+					};
+				},
+				//发送消息
+				sendMessage:function(mes){
+					let data = {
+						senderId: this.agent.uid, //用户id
+						senderName: this.agent.uname,
+						senderUrl: this.agent.headUrl,
+						accepterId: this.agent.accepter,
+						msg: mes,
+						isChat: false,
+						type: 'phone',
+						time: new Date(),
+					};
+					if(Number(this.agent.accepter)<=7000000){
+						this.agent.accepter = Number(this.agent.accepter)+7000000;
+					}
+					data = JSON.stringify(data);
+					console.log("尝试发送消息："+data);
+					if(this.socketIsOpen){
+						this.socketTask.send(data);
+					}
+				},
+				//初始化p2p连接
+				peerConnectionInit:function(){
+					var pcConfig = {
+					    "iceServers": [
+					        {
+					          "urls": [
+					            "stun:64.233.188.127:19302",
+					            "stun:[2404:6800:4008:c06::7f]:19302"
+					          ]
+					        },
+					        {
+					          "urls": [
+					            "turn:64.233.188.127:19305?transport=udp",
+					            "turn:[2404:6800:4008:c06::7f]:19305?transport=udp",
+					            "turn:64.233.188.127:19305?transport=tcp",
+					            "turn:[2404:6800:4008:c06::7f]:19305?transport=tcp"
+					          ],
+					          "username": "CLmyo/MFEgYo3mLt4vIYzc/s6OMTIICjBQ",
+					          "credential": "iqHMgEtiki1Mh7hFI4yaKJHLrz4=",
+					          "maxRateKbps": "8000"
+					        }
+					      ]
+					};
+					var ICE_config= {
+					  'iceServers': [
+					    {
+					      'url': 'stun:stun.l.google.com:19302'
+					    },
+					    {
+					      'url': 'turn:192.158.29.39:3478?transport=udp',
+					      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					      'username': '28224511:1379330808'
+					    },
+					    {
+					      'url': 'turn:192.158.29.39:3478?transport=tcp',
+					      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+					      'username': '28224511:1379330808'
+					    }
+					  ]
+					};
+					var ic_config = {
+						'iceServers':[
+							{url:'stun:stun01.sipphone.com'},
+							{url:'stun:stun.ekiga.net'},
+							{url:'stun:stun.fwdnet.net'},
+							{url:'stun:stun.ideasip.com'},
+							{url:'stun:stun.iptel.org'},
+							{url:'stun:stun.rixtelecom.se'},
+							{url:'stun:stun.schlund.de'},
+							{url:'stun:stun.l.google.com:19302'},
+							{url:'stun:stun1.l.google.com:19302'},
+							{url:'stun:stun2.l.google.com:19302'},
+							{url:'stun:stun3.l.google.com:19302'},
+							{url:'stun:stun4.l.google.com:19302'},
+							{url:'stun:stunserver.org'},
+							{url:'stun:stun.softjoys.com'},
+							{url:'stun:stun.voiparound.com'},
+							{url:'stun:stun.voipbuster.com'},
+							{url:'stun:stun.voipstunt.com'},
+							{url:'stun:stun.voxgratia.org'},
+							{url:'stun:stun.xten.com'},
+							{
+								url: 'turn:numb.viagenie.ca',
+								credential: 'muazkh',
+								username: 'webrtc@live.com'
+							},
+							{
+								url: 'turn:192.158.29.39:3478?transport=udp',
+								credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+								username: '28224511:1379330808'
+							},
+							{
+								url: 'turn:192.158.29.39:3478?transport=tcp',
+								credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+								username: '28224511:1379330808'
+							}
+						]
+					};
+					const PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+					this.peer = new RTCPeerConnection(ic_config);
+					console.log('peer初始化成功');
+					//监听数据
+					this.peer.ontrack = e => {
+						console.log("rtc收到数据"+e);
+						if (e && e.streams) {
+							console.log('收到对方音频/视频流数据...');
+							this.remoteVideo.srcObject = e.streams[0];
+						}
+					};
+					//监听候选者
+					this.peer.onicecandidate = e => {
+						if (e.candidate) {
+							console.log('搜集并发送候选人');
+							this.sendMessage(JSON.stringify({
+								type: this.target+`_ice`,
+								iceCandidate: e.candidate
+							}));
+						} else {
+							console.log('候选人收集完成！');
+						}
+					};
+				},
+				//处理url参数
+				urlParamGet:function(url){
+					 //去掉？,解码特殊字符
+					var arr= decodeURIComponent(url.split("?")[1]) ;
+					//根据“&”分割字符串
+					arr=arr.split("&");
+					//定义空的params，保存对象
+					var params={};
+					//循环遍历分割后的数组         
+					for(var p of arr){
+					   //根据“=”分割
+					  var arr2=p.split("=");
+					  //解构
+					  var [name,value]=arr2;
+					  //如果params中的name为undefined就把值填进去
+					  if(params[name]==undefined){
+					      params[name]=value;
+					  }
+					}
+					console.log(JSON.stringify(params));
+					return params;         
+				},
+				//开启通话
+				async startLive(sdp){
+					try {
+						console.log('尝试调取本地摄像头/麦克风');
+						window.navigator.getUserMedia = navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+						this.stream = await navigator.mediaDevices.getUserMedia({ "audio":true,"video":true });
+						console.log('摄像头/麦克风获取成功！');
+						if ("srcObject" in this.localVideo) {
+						    this.localVideo.srcObject = this.stream
+						} else {
+						    this.localVideo.src = window.URL && window.URL.createObjectURL(this.stream) || this.stream
+						}
+						// 将媒体轨道添加到通道中
+						this.stream.getTracks().forEach(track => {
+							console.log("将媒体轨道添加到通道中");
+							this.peer.addTrack(track, this.stream);
+						});
+					} catch {
+						console.error('摄像头/麦克风获取失败！');
+						return;
+					}
+					if (!sdp) {
+						console.log('创建本地SDP');
+						const offer = await this.peer.createOffer();
+						await this.peer.setLocalDescription(offer);
+						console.log(`传输发起方本地SDP`);
+						this.sendMessage(JSON.stringify(offer));
+					} else {
+						console.log('接收到发送方SDP');
+						await this.peer.setRemoteDescription(sdp);
+					
+						console.log('创建接收方（应答）SDP');
+						const answer = await this.peer.createAnswer();
+						console.log(`传输接收方（应答）SDP`);
+						this.sendMessage(JSON.stringify(answer));
+						await this.peer.setLocalDescription(answer);
+					}
+					//显示画面
+					var videoBox = document.querySelector('#video-box');
+					videoBox.style.display='block';
+					console.log(window.screen.width);
+					videoBox.style.width=window.screen.availWidth +'px';
+					videoBox.style.height=window.screen.availHeight+'px';
+				},
+				//握手处理
+				handShake:function(msg){
+					const { type, sdp, iceCandidate } = JSON.parse(msg)
+					if (type === 'answer') {
+						console.log("收到answer");
+						this.webRTCisOpen = true;
+						this.peer.setRemoteDescription(new RTCSessionDescription({ type, sdp }));
+					} else if (type === 'answer_ice') {
+						console.log("收到answer_ice");
+						this.peer.addIceCandidate(iceCandidate);
+					} else if (type === 'offer') {
+						console.log("收到offer");
+						this.webRTCisOpen = true;
+						this.startLive(new RTCSessionDescription({ type, sdp }));
+					} else if (type === 'offer_ice') {
+						console.log("收到offer_ice");
+						this.peer.addIceCandidate(iceCandidate);
+					}
+				},
+				//结束通话页面返回处理
+				closeChat:function(){
+					if(Number(this.agent.accepter)>7000000){
+						this.agent.accepter = Number(this.agent.accepter)-7000000;
+					}
+					console.log('返回到：/pages/message/friendChat?id='+this.agent.accepter);
+					uni.navigateTo({
+					    url: '/pages/message/friendChat?id='+this.agent.accepter
+					});	
+					this.freeResource(); //释放资源	
+				},
+				//资源释放处理
+				freeResource:function(){
+					//关闭websocket连接
+					if(this.socketIsOpen){
+						this.socketIsOpen = false;
+						this.socketTask.close();
+					}
+					//释放视频流
+					if(this.stream!=null){
+						this.stream&&this.stream.getTracks().forEach(track => {
+							console.log("释放视频/音频流");
+							track.stop();
+						});
+						this.stream = null;
+					}
+					//释放webRTC连接
+					if(null!=this.peer){
+						this.peer.close();
+						this.peer = null;
+					}
+				}
+			}
+		});
+	</script>
+	<style>
+		body{
+			background:url(../../static/images/message/background2.png)  no-repeat center center;
+			background-size:cover;
+			background-attachment:fixed;
+		}
+		.container {
+			width: 100%;
+			display: flex; 
+			/* display: -webkit-flex; */
+			/* justify-content: space-around; */
+		}
+		.video-box {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			display: none;
+		}
+		#remote-video {
+			width: 100%;
+			height: 100%;
+			display: block;
+			object-fit: cover;
+			/* border: 1px solid #eee; */
+			/* background-color: #F2F6FC; */
+		}
+		#local-video {
+			position: absolute;
+			right: 0;
+			top: 0;
+			width: 40%;
+			height: 25%;
+			object-fit: cover;
+			border: 1px solid #eee;
+			background-color: #EBEEF5;
+			/* 镜像翻转 */
+			transform: rotateY(180deg);
+			-webkit-transform: rotateY(180deg);
+			-moz-transform: rotateY(180deg);        
+		}
+		.closeBut{
+			position: absolute;
+			left: 40%;
+			bottom: 5%;
+			width: 20%;
+			z-index: 999;
+		}
+	</style>
+</body>
+</html>

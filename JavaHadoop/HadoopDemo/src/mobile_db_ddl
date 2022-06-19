@@ -1,0 +1,3 @@
+mysql>create table mobile_date(mdate varchar(90),phonenumber varchar(90),totalflow float,primary key(mdate,phonenumber));
+mysql> create table mobile_month(mmonth varchar(90),phonenumber varchar(90),totalflow float,primary key(mmonth,phonenumber));
+mysql> create table mobile_seasion(mseasion varchar(90),phonenumber varchar(90),totalflow float,primary key(mseasion,phonenumber));

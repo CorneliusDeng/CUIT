@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>教学管理系统</title>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/tms.css">
+    <script src="js/teacher.js"></script>
+</head>
+
+<body onload="javascript:getDepartments(); listAll();">
+    <nav class="nav navbar-top">
+        <div class="container-fluid">
+            <div class="col-md-3 navbar-header">
+                <a href="#" class="navbar-brand">教学管理系统</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id="app">
+        <div class="row">
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row card search-card">
+                    <div class="col-md-5">
+
+                        <!-- 搜索框以及选项框-->
+                        <form action="search" method="post">
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" name="input" placeholder="搜索...">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control" name="option">
+                                    <option value="1">按姓名搜索</option>
+                                    <option value="1">按部门搜索</option>
+                                    <option value="1">按职称搜索</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 添加教师按钮-->
+                    <div class="col-md-2 col-md-offset-5">
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#addTeacherModal">添加教师</button>
+                    </div>
+                </div>
+
+                <div class="row card" id="main">
+                    <table class="table table-hover table-striped" id="table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>#</th>
+                                <th>教师姓名</th>
+                                <th>性别</th>
+                                <th>出生日期</th>
+                                <th>学历</th>
+                                <th>职称</th>
+                                <th>所属部门</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+
+                        <!--显示教师信息的表格-->
+
+                        <tbody v-for="teacher in teachers">
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>{{teacher.t_id}}</td>
+                                <td>{{teacher.name}}</td>
+                                <td v-if="teacher.sex==1">男</td>
+                                <td v-else>女</td>
+                                <td>{{teacher.birthday}}</td>
+                                <td v-if="teacher.education==1">本科</td>
+                                <td v-else-if="teacher.education==2">研究生</td>
+                                <td v-else>博士</td>
+                                <td>{{teacher.title}}</td>
+                                <td>{{teacher.department.name}}</td>
+                                <td><button class="btn btn-info" v-on:click="javascript:updateModal(teacher.t_id)" data-toggle="modal"
+                                        data-target="#updateModal">修改</button>
+                                <button class="btn btn-warning" v-on:click="javascript:deleteTeacher(teacher.t_id)">删除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 添加教师的弹出框 -->
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">添加教师</h4>
+                </div>
+                <div class="modal-body">
+                    姓名：
+                    <input class="form-control" type="text" v-model="teacher.name" required>
+                    <span>性别：男<input type="radio" v-model="teacher.sex" value="1"> 女<input type="radio"
+                            v-model="teacher.sex" value="2"></span><br><br>
+                    出生日期：
+                    <input class="form-control" type="date" v-model="teacher.birthday">
+                    学历：
+                    <select class="form-control" v-model="teacher.education">
+                        <option value="1">本科</option>
+                        <option value="2">研究生</option>
+                        <option value="3">博士</option>
+                    </select>
+                    职称：
+                    <input class="form-control" type="text" v-model="teacher.title" required>
+                    部门：
+                    <select class="form-control" v-model="teacher.department.id">
+                        <option v-for="dept in departments" v-bind:value="dept.id">{{dept.name}}</option>
+                    </select>
+                    <button class="btn btn-info btn-block" onclick="javascript:addTeacher()">添加</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改信息的弹出框 -->
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">修改教师信息</h4>
+                </div>
+                <div class="modal-body">
+                    姓名：
+                    <input class="form-control" type="text" v-model="teacher.name" required>
+                    <span>性别：男<input type="radio" v-model="teacher.sex" value="1"> 女<input type="radio"
+                            v-model="teacher.sex" value="2"></span><br><br>
+                    出生日期：
+                    <input class="form-control" type="date" v-model="teacher.birthday">
+                    学历：
+                    <select class="form-control" v-model="teacher.education">
+                        <option value="1">本科</option>
+                        <option value="2">研究生</option>
+                        <option value="3">博士</option>
+                    </select>
+                    职称：
+                    <input class="form-control" type="text" v-model="teacher.title" required>
+                    部门：
+                    <select class="form-control" v-model="teacher.department.id">
+                        <option v-for="dept in teacherVM.departments" v-bind:value="dept.id">{{dept.name}}</option>
+                    </select>
+                    <button class="btn btn-info btn-block" onclick="javascript:updateTeacher()">修改</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    // 全局的vue变量
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            teachers: null
+        }
+    });
+    // 添加框下的所有vue变量
+    var teacherVM = new Vue({
+        el: "#addTeacherModal",
+        data: {
+            departments: null,
+            teacher: {              // 用于向后端发送请求的teacher对象
+                t_id: null,
+                name: null,
+                sex: null,
+                birthday: null,
+                education: null,
+                title: null,
+                department: {
+                    id: null,
+                    name: null
+                }
+            }
+        }
+    });
+
+    // 修改框下的vue变量
+    var updateVM = new Vue({
+        el: "#updateModal",
+        data: {
+            teacher: {        // 用于向后端发送修改请求的teacher对象
+                t_id: null,
+                name: null,
+                sex: null,
+                birthday: null,
+                education: null,
+                title: null,
+                department: {
+                    id: null,
+                    name: null
+                }
+            }
+        }
+    });
+</script>
+
+</html>

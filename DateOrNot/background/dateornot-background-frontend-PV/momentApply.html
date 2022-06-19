@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动态发布审核</title>
+    <link rel="stylesheet" href="css/layui/css/layui.css">
+    <script src="js/layui/layui.js"></script>
+    <script src="js/jquery/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery/jquery.validate.min.js"></script>
+    <script src="js/jquery/jquery.validate.extend.js"></script>
+	
+	<style type="text/css">
+	
+		.layui-table-cell{
+		
+			text-align:center;
+		
+			height: auto;
+		
+			white-space: normal;
+		
+		}
+		
+		.layui-table img{
+		
+			max-width:50px
+		
+		}
+	</style>
+</head>
+
+<body>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+	<input type="text" style="height:30px;width:200px;" name="BlogId" id="BlogId" placeholder="输入id">
+	<button type="button" id="do_search" class="layui-icon layui-icon-search layui-btn layui-btn layui-btn-xs layui-btn-radius">查询</button>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="pass">同意</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="fail">拒绝</a>
+</script>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'http://101.132.145.179:8888/dateornot/BlogCheck/QueryApplication'
+			,method:'post'
+			,page: true
+			, limit: 5
+			, limits: [5,10,20]
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,title: '动态审核表'
+            ,cols: [[
+        		{field:'serial_num', title:'待审核流水号', width:220, sort: true}
+               ,{field:'blog_id', title:'动态ID', width:100}
+               ,{field:'status', title:'状态', width:160,templet: function(row) {
+                        if (row.status == 0) {
+                            return "发布待审核"
+                        }else if(row.status == 1){
+							return "举报待审核"
+						}else{
+                        	return "未知"
+                        }
+                    }}
+               ,{field:'reason', title:'待审核原因', width:300}
+               ,{field:'time', title:'申请时间', width:300, sort: true}
+               ,{title:'操作', toolbar: '#barDemo', width:240}
+            ]]
+        });
+        
+
+      //监听行工具事件
+      table.on('tool(test)', function(obj){
+          var data = obj.data;
+          if(obj.event === 'pass'){
+      		layer.confirm('确认通过该条申请吗?', function (index){
+      		                    $.ajax({
+      		                        url:'http://101.132.145.179:8888/dateornot/BlogCheck/OptionApplicationPass',
+      		                        data:{id:data.serial_num},
+      		                        contentType:'application/json',
+      		                        success:function () {
+      		                            layer.msg('操作成功!');
+      		                            //成功后刷新界面
+      		                            setTimeout(function () {  
+      		                            	layer.close(index); 
+      		                            	window.location.reload();
+      		                            }, 500);//延迟0.5s
+      		                        }
+      		                    });
+      		                });
+          } else if(obj.event === 'fail'){
+             layer.confirm('确认拒绝该条申请吗?', function (index){
+                                 $.ajax({
+                                     url:'http://101.132.145.179:8888/dateornot/BlogCheck/OptionApplicationFail',
+                                     data:{id:data.serial_num},
+                                     contentType:'application/json',
+                                     success:function () {
+                                        layer.msg('操作成功!');
+                                        //成功后刷新界面
+                                        setTimeout(function () {  
+                                        	layer.close(index); 
+                                        	window.location.reload();
+                                        }, 500);//延迟0.5s
+                                     }
+                                 });
+                             });
+          }
+      });
+		
+		// 执行搜索，表格重载
+		    $('body').on('click', '#do_search',function () {
+		      // 搜索条件
+		      var BlogId = $('#BlogId').val();
+		      table.reload('test', {
+				url: 'http://101.132.145.179:8888/dateornot/BlogCheck/DetailApplication'
+		        ,where: {
+		          'id':  BlogId,
+		        }
+		        , page: {
+		          curr: 1
+		        }
+		      });
+		    });
+    });
+</script>
+</body>
+</html>

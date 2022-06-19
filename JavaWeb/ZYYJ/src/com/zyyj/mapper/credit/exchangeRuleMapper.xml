@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.credit.ExchangeRuleMapper">
+	
+	<!-- void addExchangeRule(ExchangeRule exchangeRule); -->
+	<insert id="addExchangeRule">
+		insert zyyj_exchangerule values(#{rule_id}, #{name}, #{createdate}, #{score}, #{integral})
+	</insert>
+	
+	<!-- List<ExchangeRule> getAllExchangeRules() -->
+	<select id="getAllExchangeRules" resultType="ExchangeRule">
+		select * from zyyj_exchangerule;
+	</select>
+	
+	<!-- void updateExchangeRule(ExchangeRule exchangeRule) -->
+	<update id="updateExchangeRule">
+		update zyyj_exchangerule set name=#{name}, score=#{score}, integral=#{integral} where rule_id=#{rule_id}
+	</update>
+	
+	<!-- void deleteExchangeRule(String rule_id) -->
+	<delete id="deleteExchangeRule">
+		delete from zyyj_exchangerule where rule_id=#{rule_id}
+	</delete>
+	
+	<select id="getMaxId" resultType="String">
+		select max(rule_id) from zyyj_exchangerule
+	</select>
+	
+	<select id="getExchangeRule" resultType="ExchangeRule">
+		select * from zyyj_exchangerule where rule_id=#{rule_id};
+	</select>
+</mapper>

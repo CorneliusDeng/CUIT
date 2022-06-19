@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+	<property>
+		<name>mobile_1</name>
+		<value>INSERT INTO mobile_date(
+			mdate,
+			phonenumber,
+			totalflow)
+			VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE mdate = ?,phonenumber=?</value>
+	</property>
+	<property>
+		<name>mobile_2</name>
+		<value>INSERT INTO mobile_month(
+			mmonth,
+			phonenumber,
+			totalflow)
+			VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE mmonth = ?,phonenumber=?</value>
+	</property>
+	<property>
+		<name>mobile_3</name>
+		<value>INSERT INTO mobile_seasion(
+			mseasion,
+			phonenumber,
+			totalflow)
+			VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE mseasion = ?,phonenumber=?</value>
+	</property>
+</configuration>

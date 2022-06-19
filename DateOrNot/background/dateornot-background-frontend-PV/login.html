@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>welcome login</title>
+
+    <link rel="stylesheet" href="css/layui/css/layui.css">
+	<script src="js/layui/layui.js"></script>
+	<script src="js/jquery/jquery-3.3.1.min.js"></script>
+	<script src="js/jquery/jquery.validate.min.js"></script>
+	<script src="js/jquery/jquery.validate.extend.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            background-image: url('img/bg.jpg');
+            background-repeat:no-repeat;
+            background-position:0% 0%;
+            background-size:cover;
+        }
+        .divForm{
+            position: absolute;
+            width: 350px;
+            height: 150px;
+
+            border: 0px;
+            text-align: center;
+            top: 70%;
+            left: 20%;
+            margin-top: -200px;
+            margin-left: -250px;
+        }
+    </style>
+</head>
+
+<body>
+<fieldset class="layui-elem-field layui-field-title">
+    <legend align="center">约了吗—校园交友平台</legend>
+</fieldset>
+<div class="divForm">
+    <form id="loginForm" action="" method="post">
+        <table>
+            <tr>
+                <td>
+                    <label class="layui-form-label" for="username">账号</label>
+                </td>
+                <td>
+                    <input type="text" id="username" name="username" placeholder="请输入用户名" autocomplete="off"
+                           class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="layui-form-label" for="password">密码</label>
+                </td>
+                <td>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" autocomplete="off"
+                           class="layui-input">
+                </td>
+
+                <td style="width: 80px">
+                    <button class="layui-btn" id="loginBut" type="button" lay-filter="formDemo">登录</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var layer;
+        layui.use(['layer'], function () {
+            layer = layui.layer;
+        })
+
+	$("#loginForm").validate({ //自动化表单验证
+	            errorElement: "em",
+	            onkeyup: false, //是否输入一个数据即调用表单验证
+	            rules: {    //表单验证规则
+	                username: {
+	                    required: true, //必填
+	                    isUserName: true
+	                },
+	                password: {
+	                    required: true, //必填
+	                    maxlength: 10,
+	                    minlength: 3
+	                }
+	            },
+	            messages: { //出错显示
+	                username: {
+	                    required: "账号不能为空"
+	                },
+	                password: {
+	                    required: "密码不能为空",
+	                    maxlength: "最大为10字符",
+	                    minlength: "最小为3字符"
+	                }
+	            }
+	        });
+	
+	        $("#loginBut").click(function () {  //点击登录按钮操作
+			var username = document.getElementById("username").value;
+			var password = document.getElementById("password").value;
+	            if ($("#loginForm").validate().form()) {    //表单验证成功
+	                if(username=="king"&&password=="12345678"){
+						location.href = "home.html";
+					}else{
+						layer.alert("用户名或密码错误!请重试!");
+					}
+	            }
+	        });
+    });
+</script>
+</body>
+</html>
+      

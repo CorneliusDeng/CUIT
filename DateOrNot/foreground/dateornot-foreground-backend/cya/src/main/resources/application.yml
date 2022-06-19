@@ -1,0 +1,22 @@
+mybatis:
+  type-aliases-package: com.demo.ylm.mapper
+  #  config-location: classpath:mybatis-cfg.xml        # mybatis配置文件所在路径
+  mapper-locations: classpath:mapper/*Mapper.xml                       # mapper映射文件
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://1.14.43.96:3306/DateOrNot
+    username: root
+    password: 12345678
+#  thymeleaf:
+#    prefix: classpath:/static/
+#    mode: HTML
+#    cache: false
+#    encoding: UTF-8
+#    #     新版本不支持content-type: text/html，故新写法
+#    servlet:
+#      content-type: text/html
+
+server:
+  port: 8080

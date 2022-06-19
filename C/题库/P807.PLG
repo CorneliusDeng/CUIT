@@ -1,0 +1,25 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: P807 - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Users\CorneliusDeng\AppData\Local\Temp\RSPCA49.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/P807.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\Csourcecode\Ã‚ø‚\P807.C"
+]
+Creating command line "cl.exe @C:\Users\CorneliusDeng\AppData\Local\Temp\RSPCA49.tmp" 
+<h3>Output Window</h3>
+Compiling...
+P807.C
+
+
+
+<h3>Results</h3>
+P807.OBJ - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

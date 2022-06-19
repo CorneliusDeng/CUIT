@@ -1,0 +1,22 @@
+*.class
+*.log
+*.lock
+
+bin/
+Debug/
+out/
+.vs/
+.metadata/
+.build/
+target/
+
+*.idea/
+*.iml
+
+### IDEA ###
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/

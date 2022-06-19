@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dateornotbackend.mapper.GroupCheckMapper">
+
+    <delete id="DeleteGroupCheck">
+        delete from GroupCheck where serial_num = #{serial_num}
+    </delete>
+
+
+    <select id="QueryGroupCheckApplication" resultType="com.dateornotbackend.entity.GroupCheck">
+        select * from GroupCheck where status = 0
+    </select>
+
+    <select id="QueryGroupCheckWarn" resultType="com.dateornotbackend.entity.GroupCheck">
+        select * from GroupCheck where status = 1
+    </select>
+
+
+    <select id="DetailGroupApplicationCheck" resultType="com.dateornotbackend.entity.GroupCheck">
+        select * from GroupCheck where serial_num = #{serial_num} and status = 0
+    </select>
+
+    <select id="DetailGroupWarnCheck" resultType="com.dateornotbackend.entity.GroupCheck">
+        select * from GroupCheck where serial_num = #{serial_num} and status = 1
+    </select>
+
+</mapper>

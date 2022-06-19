@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>student</display-name>
+  <welcome-file-list>
+ 	<welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>StudentListAction</servlet-name>
+    <servlet-class>student.StudentListAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StudentListAction</servlet-name>
+    <url-pattern>/servlet/StudentListAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>StudentDelAction</servlet-name>
+    <servlet-class>student.StudentDelAction</servlet-class>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>StudentDelAction</servlet-name>
+    <url-pattern>/servlet/StudentDelAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>StudentGetAction</servlet-name>
+    <servlet-class>student.StudentGetAction</servlet-class>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>StudentGetAction</servlet-name>
+    <url-pattern>/servlet/StudentGetAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>StudentUpdateAction</servlet-name>
+    <servlet-class>student.StudentUpdateAction</servlet-class>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>StudentUpdateAction</servlet-name>
+    <url-pattern>/servlet/StudentUpdateAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+  	<servlet-name>DisplayChart</servlet-name>
+  	<servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DisplayChart</servlet-name>
+    <url-pattern>/servlet/DisplayChart</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>UserListAction</servlet-name>
+    <servlet-class>user.UserListAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserListAction</servlet-name>
+    <url-pattern>/servlet/UserListAction</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>UserGetAction</servlet-name>
+    <servlet-class>user.UserGetAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserGetAction</servlet-name>
+    <url-pattern>/servlet/UserGetAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>UserUpdateAction</servlet-name>
+    <servlet-class>user.UserUpdateAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserUpdateAction</servlet-name>
+    <url-pattern>/servlet/UserUpdateAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>UserDelAction</servlet-name>
+    <servlet-class>user.UserDelAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserDelAction</servlet-name>
+    <url-pattern>/servlet/UserDelAction</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>UserNameCheckAction</servlet-name>
+    <servlet-class>user.UserNameCheckAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserNameCheckAction</servlet-name>
+    <url-pattern>/servlet/UserNameCheckAction</url-pattern>
+  </servlet-mapping>
+</web-app>

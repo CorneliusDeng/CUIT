@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>教学管理系统</title>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/tms.css">
+    <script src="js/course.js"></script>
+</head>
+
+<body onload="javascript:getAll();">
+    <nav class="nav navbar-top">
+        <div class="container-fluid">
+            <div class="col-md-3 navbar-header">
+                <a href="#" class="navbar-brand">教学管理系统</a>
+            </div>
+            <div class="col-md-1 col-md-offset-8" align="center">
+                <a href="#" class="navbar-exit">注销</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id="app">
+        <div class="row">
+
+            <div class="col-md-9 col-md-offset-2">
+                <div class="row card search-card">
+                    <div class="col-md-5">
+
+                        <!-- 搜索框以及选项框-->
+                        <form action="search" method="post">
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" name="input" placeholder="搜索...">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control" name="option">
+                                    <option value="1">按名称搜索</option>
+                                    <option value="1">按性质搜索</option>
+                                    <option value="1">按专业搜索</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 添加教师按钮-->
+                    <div class="col-md-2 col-md-offset-5">
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#addCourseModal">添加课程</button>
+                    </div>
+                </div>
+
+                <div class="row card" id="main">
+                    <table class="table table-hover table-striped" id="table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>#</th>
+                                <th>名称</th>
+                                <th>性质</th>
+                                <th>学分</th>
+                                <th>开设年级</th>
+                                <th>开设专业</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+
+                        <!--显示教师信息的表格-->
+
+                        <tbody>
+                            <tr v-for="course in courses">
+                                <td><input type="checkbox"></td>
+                                <td>{{course.id}}</td>
+                                <td>{{course.name}}</td>
+                                <td>{{types[course.type-1].name}}</td>
+                                <td>{{course.credit}}</td>
+                                <td>{{course.grade}}</td>
+                                <td>{{majors[course.major-1].name}}</td>
+                                <td>
+                                    <button class="btn btn-info" v-on:click="javascript: updateModal(course.id)" data-toggle="modal" data-target="#updateCourseModal">修改</button>
+                                    <button class="btn btn-warning" v-on:click="javascript:deleteCourse(course.id)">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="addCourseModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">添加课程</h4>
+                </div>
+                <div class="modal-body">
+                    名称：
+                    <input class="form-control" type="text" v-model="course.name" required>
+                    性质：
+                    <select class="form-control" v-model="course.type" required>
+                        <option v-for="type in types" v-bind:value="type.id">{{type.name}}</option>
+                    </select>
+                    学分：
+                    <input class="form-control" type="text" v-model="course.credit" required>
+                    开设年级：
+                    <input class="form-control" type="text" v-model="course.grade" required>
+                    开设专业:
+                    <select class="form-control" v-model="course.major" required>
+                        <option v-for="major in majors" v-bind:value="major.id">{{major.name}}</option>
+                    </select>
+                    备注：
+                    <textarea class="form-control" cols="20" rows="5" v-model="course.detail"></textarea>
+                    <button class="btn btn-info btn-block" onclick="javascript:addCourse()" style="margin-top:10px">添加</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改信息的弹出框 -->
+    <div class="modal fade" id="updateCourseModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">修改课程信息</h4>
+                </div>
+                <div class="modal-body">
+                    名称：
+                    <input class="form-control" type="text" v-model="course.name" required>
+                    性质：
+                    <select class="form-control" v-model="course.type" required>
+                        <option v-for="type in types" v-bind:value="type.id">{{type.name}}</option>
+                    </select>
+                    学分：
+                    <input class="form-control" type="text" v-model="course.credit" required>
+                    开设年级：
+                    <input class="form-control" type="text" v-model="course.grade" required>
+                    开设专业:
+                    <select class="form-control" v-model="course.major" required>
+                        <option v-for="major in majors" v-bind:value="major.id">{{major.name}}</option>
+                    </select>
+                    备注：
+                    <textarea class="form-control" cols="20" rows="5" v-model="course.detail"></textarea>
+                    <button class="btn btn-info btn-block" onclick="javascript:updateTeacher()" style="margin-top:10px">修改</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    let majors = [{id:"1", name: "软件工程"},{id:"2", name: "空间信息"},{id:"3", name: "大数据"}];
+    let types = [{id:"1", name: "公共基础必修课"},{id:"2", name: "公共选修课"},{id:"3", name: "学科基础课"}, {id:"4", name: "专业必修课"}, {id:"5", name: "专业选修课"}, {id:"6", name: "集中性实践教学环节"}]
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            courses: null,
+            majors: majors,
+            types: types
+        }
+    });
+
+    var addVM = new Vue({
+        el:"#addCourseModal",
+        data:{
+            majors: majors,
+            types: types,
+            course: {
+                id: null,
+                name: null,
+                type: null,
+                credit: null,
+                grade: null,
+                major: null,
+                detail: null
+            }
+        }
+    });
+
+    var updateVM = new Vue({
+        el:"#updateCourseModal",
+        data:{
+            majors: majors,
+            types: types,
+            course: {
+                id: null,
+                name: null,
+                type: null,
+                credit: null,
+                grade: null,
+                major: null,
+                detail: null
+            }
+        }
+    });
+</script>
+
+</html>

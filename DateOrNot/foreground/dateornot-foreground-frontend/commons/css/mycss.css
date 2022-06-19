@@ -1,0 +1,137 @@
+// 页面撑开头部样式
+.content {
+	padding-top: var(--status-bar-height);
+}
+
+/* 头部公用样式 */
+.top-bar {
+	position: fixed;
+	z-index: 1001;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 88rpx;
+	padding-top: var(--status-bar-height);
+
+	.search-div {
+		position: absolute;
+		// top: 0;
+		left: 0;
+		width: 100%;
+		z-index: -1;
+		box-sizing: border-box;
+		padding: 14rpx 118rpx 14rpx $uni-spacing-col-base;
+
+		.search {
+			padding: 0 60rpx 0 12rpx;
+			height: 60rpx;
+			background: $uni-bg-color-grey;
+			border-radius: 10rpx;
+		}
+
+		.search-img {
+			position: absolute;
+			right: 130rpx;
+			top: 22rpx;
+			width: 40rpx;
+			height: 40rpx;
+			float: right;
+		}
+	}
+
+	.top-bar-left {
+		float: left;
+		padding-left: $uni-spacing-col-base;
+
+		image {
+			margin-top: 10rpx;
+			width: 68rpx;
+			height: 68rpx;
+			border-radius: 16rpx;
+		}
+
+		.back-img {
+			margin-top: 21rpx;
+			width: 52rpx;
+			height: 52rpx;
+		}
+		.text1 {
+			font-size: $uni-font-size-lg;
+			font-weight: 500;
+			color: $uni-text-color;
+			line-height: 88rpx;
+		}
+	}
+
+	.top-bar-center {
+		position: absolute;
+		text-align: center;
+		left: 0;
+		right: 0;
+		width: 158rpx;
+		top: 10rpx;
+		bottom: 0;
+		margin: auto;
+		padding-top: var(--status-bar-height);
+
+		.logo {
+			width: 158rpx;
+			height: 68rpx;
+		}
+	}
+
+	.top-bar-right {
+		float: right;
+
+		.search {
+			width: 88rpx;
+			height: 88rpx;
+			display: inline-block;
+		}
+
+		.add {
+			width: 88rpx;
+			height: 88rpx;
+			padding-right: 14rpx;
+			display: inline-block;
+		}
+
+		.text {
+			font-size: $uni-font-size-lg;
+			font-weight: 500;
+			padding-right: 32rpx;
+			color: $uni-text-color;
+			line-height: 88rpx;
+		}
+
+		.more-img {
+			padding-right: $uni-spacing-col-base;
+
+			image {
+				margin-top: 15rpx; //自改
+				width: 52rpx;
+				height: 52rpx;
+			}
+		}
+	}
+}
+
+// 底部公用样式
+.bottom-bar {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	height: 90rpx;
+	padding-top: 10rpx;
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+// btn1样式
+.btn1 {
+	text-align: center;
+	line-height: 80rpx;
+	height: 80rpx;
+	color: $uni-text-color;
+	font-size: $uni-font-size-lg;
+	border-radius: $uni-border-radius-sm;
+}

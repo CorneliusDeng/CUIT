@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>教学管理系统</title>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/tms.css">
+    <script src="js/teacher-course.js"></script>
+</head>
+
+<body onload="javascript:loadTeachers(); loadCourses(); getAll();">
+    <nav class="nav navbar-top">
+        <div class="container-fluid">
+            <div class="col-md-3 navbar-header">
+                <a href="#" class="navbar-brand">教学管理系统</a>
+            </div>
+            <div class="col-md-1 col-md-offset-8" align="center">
+                <a href="#" class="navbar-exit">注销</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id="app">
+        <div class="row">
+
+            <div class="col-md-9 col-md-offset-1">
+                <div class="row card search-card">
+                    <div class="col-md-5">
+
+                        <!-- 搜索框以及选项框-->
+                        <form action="search" method="post">
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" name="input" placeholder="搜索...">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control" name="option">
+                                    <option value="1">按姓名搜索</option>
+                                    <option value="1">按部门搜索</option>
+                                    <option value="1">按职称搜索</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 添加授课按钮-->
+                    <div class="col-md-2 col-md-offset-5">
+                        <button class="btn btn-warning" data-toggle="modal"
+                            data-target="#addTeacherCourseModal">添加授课信息</button>
+                    </div>
+                </div>
+
+                <div class="row card" id="main">
+                    <table class="table table-hover table-striped" id="table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>#</th>
+                                <th>课程</th>
+                                <th>授课老师</th>
+                                <th>总课时</th>
+                                <th>起始周</th>
+                                <th>结束周</th>
+                                <th>已结课？</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+
+                        <!--显示教师授课信息的表格-->
+
+                        <tbody v-for="tc in teacher_courses">
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>{{tc.id}}</td>
+                                <td>{{tc.course}}</td>
+                                <td>{{tc.teacher}}</td>
+                                <td>{{tc.times}}</td>
+                                <td>{{tc.start_week}}</td>
+                                <td>{{tc.end_week}}</td>
+                                <td v-if="tc.status==1">已结课</td>
+                                <td v-else>未结课</td>
+                                <td><button class="btn btn-info" v-on:click="javascript:updateModal(tc.id)" data-toggle="modal"
+                                        data-target="#updateTeacherCourseModal">修改</button>
+                                <button class="btn btn-warning" v-on:click="javascript:deleteTeacherCourse(tc.id)">删除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改信息的弹出框 -->
+    <div class="modal fade" id="updateTeacherCourseModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">修改教师信息</h4>
+                </div>
+                <div class="modal-body">
+                    授课教师：
+                    <select class="form-control" v-model="teacher_course.teacher">
+                        <option v-for="teacher in teachers" v-bind:value="teacher.name">{{teacher.name}}</option>
+                    </select>
+                    课程：
+                    <select class="form-control" v-model="teacher_course.course">
+                        <option v-for="course in courses" v-bind:value="course.name">{{course.name}}</option>
+                    </select>
+                    课时数：
+                    <input class="form-control" type="text" v-model="teacher_course.times">
+                    起始周：
+                    <input class="form-control" type="text" v-model="teacher_course.start_week">
+                    结束周：
+                    <input class="form-control" type="text" v-model="teacher_course.end_week">
+                    状态：
+                    <span>已结课：<input type="radio" value="1" v-model="teacher_course.status"> 未结课：<input type="radio" value="0" v-model="teacher_course.status"></span>
+                    <button class="btn btn-info btn-block" onclick="javascript:updateTeacherCourse()">修改</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addTeacherCourseModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">添加授课信息</h4>
+                </div>
+                <div class="modal-body">
+                    授课教师：
+                    <select class="form-control" v-model="teacher_course.teacher">
+                        <option v-for="teacher in teachers" v-bind:value="teacher.t_id">{{teacher.name}}</option>
+                    </select>
+                    课程：
+                    <select class="form-control" v-model="teacher_course.course">
+                        <option v-for="course in courses" v-bind:value="course.id">{{course.name}}</option>
+                    </select>
+                    课时数：
+                    <input class="form-control" type="text" v-model="teacher_course.times">
+                    起始周：
+                    <input class="form-control" type="text" v-model="teacher_course.start_week">
+                    结束周：
+                    <input class="form-control" type="text" v-model="teacher_course.end_week">
+                    状态：
+                    <span>已结课：<input type="radio" v-model="teacher_course.status" value="1"> 未结课：<input type="radio" v-model="teacher_course.status" value="0"></span>
+                    <button class="btn btn-info btn-block" onclick="javascript:addTeacherCourse()">添加</button>
+                </div>
+
+                <div class="modal-footer" align="center">
+                    <a href="#" data-dismiss="modal">关闭</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    // 全局的vue变量
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            teacher_courses: null
+        }
+    });
+    var addVM = new Vue({
+        el: "#addTeacherCourseModal",
+        data: {
+            teachers: null,
+            courses: null,
+            teacher_course: {
+                teacher: null,
+                course: null,
+                times: null,
+                start_week: null,
+                end_week: null,
+                status: null
+            }
+        }
+    });
+    var updateVM = new Vue({
+        el: "#updateTeacherCourseModal",
+        data: {
+            teachers: null,
+            courses: null,
+            teacher_course: {
+                teacher: null,
+                course: null,
+                times: null,
+                start_week: null,
+                end_week: null,
+                status: null
+            }
+        }
+    });
+</script>
+
+</html>

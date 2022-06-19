@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.practice.CheckpointMapper">
+	
+	<!-- List<Checkpoint> getAllCheckpoints(); -->
+	<select id="getAllCheckpoints" resultType="Checkpoint">
+		select c.checkpoint_id, c.name, u.realname as creator, concat(co.name, p.name) as programme, c.limit_time, c.question_num, c.total_score, c.pass_score, c.comment  
+		from zyyj_checkpoint as c, zyyj_programme as p, zyyj_user as u, zyyj_course_programme as cp, zyyj_course as co 
+		where c.programme_id=p.programme_id and u.user_id=c.user_id and cp.course_id=co.course_id and p.programme_id=cp.programme_id;
+	</select>
+	<!-- Checkpoint getCheckpoint(String checkpoint_id); -->
+	<select id="getCheckpoint" resultType="Checkpoint">
+		select c.checkpoint_id, c.name, u.realname as creator, concat(co.name, p.name) as programme, c.limit_time, c.question_num, c.total_score, c.pass_score, c.comment  
+		from zyyj_checkpoint as c, zyyj_programme as p, zyyj_user as u, zyyj_course_programme as cp, zyyj_course as co 
+		where c.programme_id=p.programme_id and u.user_id=c.user_id and cp.course_id=co.course_id and p.programme_id=cp.programme_id and c.checkpoint_id=#{checkpoint_id};
+	</select>
+	
+	<!-- getAllProgrammes() -->
+	<select id="getAllProgrammes" resultType="String">
+		select concat(c.name, p.name) as programme from zyyj_programme as p, zyyj_course_programme as cp, zyyj_course as c 
+		where cp.course_id=c.course_id and p.programme_id=cp.programme_id;
+	</select>
+	
+	<!-- int addCheckpoint() -->
+	<insert id="addCheckpoint">
+		insert zyyj_checkpoint values(#{checkpoint_id}, (select user_id from zyyj_user where realname=#{creator}), 
+		(select p.programme_id from zyyj_programme as p, zyyj_course as c, zyyj_course_programme as cp where p.programme_id=cp.programme_id and c.course_id=cp.course_id and concat(c.name, p.name)=#{programme}), 
+		#{name}, #{limit_time},#{question_num}, #{total_score},#{pass_score},#{comment});
+	</insert>
+	<!-- String getMaxId() -->
+	<select id="getMaxId" resultType="String">
+		select max(checkpoint_id) from zyyj_checkpoint;
+	</select>
+	
+	<!-- int deleteCheckpoint(String checkpoint_id) -->
+	<delete id="deleteCheckpoint">
+		delete from zyyj_checkpoint where checkpoint_id=#{checkpoint_id};
+	</delete>
+	
+	<!-- int updateCheckpoint(Checkpoint checkpoint); -->
+	<update id="updateCheckpoint">
+		update zyyj_checkpoint set name=#{name}, 
+		programme_id=(select p.programme_id from zyyj_course as c, zyyj_course_programme as cp, zyyj_programme as p where concat(c.name,p.name)=#{programme} and c.course_id=cp.course_id and p.programme_id=cp.programme_id), 
+		limit_time=#{limit_time}, question_num=#{question_num}, total_score=#{total_score}, pass_score=#{pass_score}, comment=#{comment} 
+		where checkpoint_id=#{checkpoint_id};
+	</update>
+</mapper>

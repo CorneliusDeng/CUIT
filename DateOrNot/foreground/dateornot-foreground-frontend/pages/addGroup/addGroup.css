@@ -1,0 +1,105 @@
+.title-wrapper {
+    flex-direction: column;
+    position: relative;
+    top: 5%;
+    width: 100%;
+}
+
+.title {
+    font-size: 40px;
+    position: relative;
+    left: 10%;
+}
+
+.group-name-wrapper {
+    position: relative;
+    left: 10%;
+}
+
+.notice-wrapper {
+    position: relative;
+    left: 10%;
+    top: 6%;
+}
+
+.notice {
+    color: #aaaaaa;
+}
+
+.form-wrapper {
+    position: relative;
+    left: 10%;
+    top: 10%;
+    width: 100%;
+    height: 10%;
+}
+
+.form-wrapper-tag{
+	position: relative;
+	left: 10%;
+	top: 10%;
+	width: 100%;
+	height: 15%;
+}
+
+.form-text {
+	height: 10%;
+    font-size: 20px;
+}
+
+input {
+    border-bottom: #C5CBD5 solid 1px;
+    width: 85%;
+    font-size: 18px;
+}
+
+textarea {
+    border-bottom: #C5CBD5 solid 1px;
+    width: 85%;
+}
+
+.des-placeholder {
+    position: relative;
+    bottom: 0px;
+}
+
+.create-button {
+    position: absolute;
+    width: 80%;
+    left: 10%;
+    top: 82%;
+}
+
+.group-tag {
+    justify-content: center;
+    margin-left: 3px;
+    margin-bottom: 3px;
+}
+
+.tag-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    width: 80%;
+    height: 90%;
+    margin-top: 10px;
+}
+.potrait-wrapper{
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	left: 25%;
+}
+.potrait{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%
+}
+.exit-link{
+	position: absolute;
+	left: 10%;
+	width: 80%;
+	top: 90%;
+	font-size: 18px;
+	color: #999999;
+	text-align: center;
+}

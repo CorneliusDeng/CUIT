@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "找群",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-tag": "/components/uni-tag/uni-tag"
+  }
+}

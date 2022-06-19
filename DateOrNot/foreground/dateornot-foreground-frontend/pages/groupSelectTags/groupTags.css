@@ -1,0 +1,67 @@
+.title-wrapper {
+    flex-direction: column;
+    position: absolute;
+    top: 5%;
+	left: 10%;
+	height: 5%;
+    width: 100%;
+}
+
+.title {
+    font-size: 32px;
+}
+.refresh{
+	width: 22px;
+	height: 22px;
+	margin-left: 20px;
+}
+
+.charts-box{
+	position: absolute;
+	top: 20%;
+	height: 40%;
+	width: 100%;
+}
+.small-wrapper{
+	position: absolute;
+	top: 60%;
+	left: 10%;
+	height: 5%;
+	width: 100%;
+}
+.small-title{
+	font-size: 20px;
+}
+
+.group-tag {
+    justify-content: center;
+    margin-left: 3px;
+    margin-bottom: 3px;
+}
+
+.tag-wrapper {
+	position: absolute;
+    display: flex;
+    flex-flow: row wrap;
+	top: 65%;
+	left: 10%;
+    width: 80%;
+    height: 10%;
+}
+
+.button-wrapper{
+	position: absolute;
+	left: 10%;
+	width: 80%;
+	top: 82%;
+}
+
+.exit-link{
+	position: absolute;
+	left: 10%;
+	width: 80%;
+	top: 90%;
+	font-size: 18px;
+	color: #999999;
+	text-align: center;
+}

@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "matching.timeout",
+      "type": "java.lang.Long",
+      "description": "Description for matching.timeout."
+    },
+    {
+      "name": "matchpool.compressor.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Description for matchpool.compressor.enabled."
+    }
+  ] }

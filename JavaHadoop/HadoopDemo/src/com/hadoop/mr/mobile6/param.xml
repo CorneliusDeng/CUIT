@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+	<property>
+		<name>param_1</name>
+		<value>com.hadoop.mr.mobile6.collector.DateCollector</value>
+	</property>
+	<property>
+		<name>param_2</name>
+		<value>com.hadoop.mr.mobile6.collector.MonthCollector</value>
+	</property>
+	<property>
+		<name>param_3</name>
+		<value>com.hadoop.mr.mobile6.collector.SeasionCollector</value>
+	</property>
+</configuration>

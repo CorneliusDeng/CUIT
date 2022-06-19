@@ -1,0 +1,20 @@
+.myself
+{
+    background:#efecec;
+    height:32px;
+    width:60px;
+    line-height:28px;
+    border:1px solid #deb887;
+    -moz-border-radius:20px;
+    -webkit-border-radius:2px;
+    border-radius:2px;
+}
+
+.sidebar{background-color:DimGray; height:1200px;}
+.nav-item{padding:3px;}
+.nav-text{color:#deb887;}
+#header{color:#deb887;}
+.sidebar-divider{margin:0px; border-top:0px solid rgba(255,255,255,.15)}
+body{background-color:#efecec;}
+#main{background-color:white; margin:20px; padding:20px;
+    border-radius:10px 10px 10px 10px;}

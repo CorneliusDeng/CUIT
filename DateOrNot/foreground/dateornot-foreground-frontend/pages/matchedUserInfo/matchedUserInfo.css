@@ -1,0 +1,69 @@
+.avatar-wrapper {
+    position: absolute;
+    width: 25%;
+    height: 12%;
+    left: 37.5%;
+    top: 10%;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.username-wrapper {
+    position: absolute;
+    width: 50%;
+    height: 5%;
+    left: 25%;
+    top: 24%;
+    display: flex;
+    justify-content: center;
+}
+
+.username {
+    font-size: 28px;
+}
+
+.gender-age-wrapper {
+    position: absolute;
+    width: 15%;
+    top: 30%;
+    left: 42.5%;
+    display: flex;
+    justify-content: center;
+}
+
+.description-wrapper {
+    position: absolute;
+    width: 70%;
+    top: 35%;
+    height: 20%;
+    left: 15%;
+    display: flex;
+    justify-content: center;
+}
+
+.description {
+    color: #AAAAAA;
+}
+
+.charts-box {
+	position: absolute;
+	top: 55%;
+	width: 100%;
+	height: 20%;
+}
+
+.button-wrapper {
+    position: absolute;
+    width: 70%;
+    left: 15%;
+    top: 85%;
+}
+
+.exit-link {
+
+    margin-top: 15px;
+}

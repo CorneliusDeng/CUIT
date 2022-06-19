@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人脸识别</title>
+<!--    人脸识别：
+发送两张图片给服务端，服务端会返回一个返回值，判断这张图片的是否是
+同一个人
+调用的接口地址：https://api-cn.faceplusplus.com/facepp/v3/compare
+调用接口的方法：post
+数据编码方式：multipart/form-data
+调用接口的参数：
+api_key
+api_secret
+image_file1
+image_file2
+ -->
+</head>
+<body>
+<form action="https://api-cn.faceplusplus.com/facepp/v3/compare" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="api_key" value="OVHDatOz2oMDzUPFt72QMvJydexI0gPN"/>
+    <input type="hidden" name="api_secret" value="NTJRr0ZloCFf5NnvjSTgjTzwRZCGwtj1"/>
+    <table>
+      <tr>
+          <td>请选择第一张图片</td>
+          <td><input type="file" name="image_file1"/></td>
+      </tr>
+        <tr>
+          <td>请选择第二张图片</td>
+          <td><input type="file" name="image_file2"/></td>
+      </tr>
+         <tr>
+          <td></td>
+          <td><input type="submit" /></td>
+      </tr>
+    </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.demo.ylm.mapper.UserMapper">
+    <!-- TODO 不考虑【密集请求下的】多线程和事务  -->
+
+    <!--获得一个用户 -->
+    <select id="getOne" resultType="com.demo.ylm.entity.User">
+        select uid, username, profile
+        from user_tb
+        where uid = 1;
+    </select>
+    <!--    修改一个用户的基本信息-->
+    <update id="updateInfo" parameterType="com.demo.ylm.entity.User">
+        update user_tb UTB set
+        UTB.gender = #{user.gender},
+        UTB.introduction = #{user.introduction},
+        UTB.birthday = #{user.birthday}
+        where UTB.username = #{user.username}
+    </update>
+
+
+    <!--    登陆-->
+    <select id="selectByUsernamePwd" resultType="java.lang.Integer">
+        select count(*)
+        from user_tb
+        where username = #{username}
+          and password = #{password};
+    </select>
+
+
+    <!--    注册-用户名是否存在-->
+    <select id="selectByUsername" resultType="java.lang.Integer">
+        select count(*)
+        from user_tb
+        where username = #{username};
+    </select>
+
+    <insert id="insertUser">
+        insert into user_tb(username, password, uid)
+        values (#{username}, #{password}, #{uid10})
+    </insert>
+
+    <!--    修改密码-->
+    <update id="pwdModify">
+        update user_tb set password = #{password} where username = #{username}
+    </update>
+
+    <!--    修改头像-->
+    <update id="updateProfile">
+        update user_tb set profile = #{profile} where username = #{username}
+    </update>
+
+    <!--    获取用户之前头像地址-->
+    <select id="getPreProfile" resultType="java.lang.String">
+        select profile from user_tb where username = #{username}
+    </select>
+
+
+    <!--    获取用户信息，根据账号 username-->
+    <select id="getUserByUsername" resultType="com.demo.ylm.entity.User">
+        select username,uid,profile,tag,birthday, gender, introduction from user_tb where username = #{username}
+    </select>
+</mapper>

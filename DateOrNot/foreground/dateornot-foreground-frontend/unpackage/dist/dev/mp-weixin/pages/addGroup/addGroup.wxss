@@ -1,0 +1,74 @@
+.title-wrapper.data-v-c0247f74 {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+            flex-direction: column;
+    position: relative;
+    top: 5%;
+    width: 100%;
+}
+.title.data-v-c0247f74 {
+    font-size: 40px;
+    position: relative;
+    left: 10%;
+}
+.group-name-wrapper.data-v-c0247f74 {
+    position: relative;
+    left: 10%;
+}
+.notice-wrapper.data-v-c0247f74 {
+    position: relative;
+    left: 10%;
+    top: 6%;
+}
+.notice.data-v-c0247f74 {
+    color: #aaaaaa;
+}
+.form-wrapper.data-v-c0247f74 {
+    position: relative;
+    left: 10%;
+    top: 10%;
+    width: 100%;
+    height: 10%;
+}
+.form-text.data-v-c0247f74 {
+    font-size: 20px;
+}
+input.data-v-c0247f74 {
+    border-bottom: #C5CBD5 solid 1px;
+    width: 85%;
+    font-size: 18px;
+}
+textarea.data-v-c0247f74 {
+    border-bottom: #C5CBD5 solid 1px;
+    width: 85%;
+}
+.des-placeholder.data-v-c0247f74 {
+    position: relative;
+    bottom: 0px;
+}
+.create-button.data-v-c0247f74 {
+    position: absolute;
+    width: 80%;
+    left: 10%;
+    top: 80%;
+}
+.group-tag.data-v-c0247f74 {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    margin-left: 3px;
+    margin-bottom: 3px;
+}
+.tag-wrapper.data-v-c0247f74 {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: row wrap;
+            flex-flow: row wrap;
+    width: 80%;
+    height: 100px;
+    margin-top: 10px;
+}

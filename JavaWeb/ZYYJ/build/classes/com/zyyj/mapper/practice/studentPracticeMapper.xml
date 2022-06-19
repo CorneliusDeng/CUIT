@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.practice.StudentPracticeMapper">
+	
+	<!-- List<StudentPractice> getAllStudentPractice(); -->
+	<select id="getAllStudentPractice" resultType="StudentPractice">
+		select 
+			practice_id, stu.name as stuName, 
+			status, createtime, sp.score, 
+			p.name as programme, c.name as course
+		from 
+			zyyj_programme as p, zyyj_student_practice as sp, zyyj_student as stu, zyyj_course as c 
+		where 
+			p.programme_id=sp.programme_id and 
+			stu.stu_id=sp.stu_id and 
+			c.course_id=sp.course_id;
+	</select>
+	
+	<delete id="deleteStudentPractice">
+		DELETE FROM zyyj_student_practice 
+		WHERE programme_id=#{programme_id};
+	</delete>
+	
+	<select id="searchByStudent" resultType="StudentPractice">
+		SELECT  
+			practice_id, stu.name as stuName, 
+			status, createtime, sp.score, 
+			p.name as programme, c.name as course
+		FROM 
+			zyyj_programme as p, zyyj_student_practice as sp, zyyj_student as stu, zyyj_course as c 
+		WHERE 
+			p.programme_id=sp.programme_id and 
+			stu.stu_id=sp.stu_id and 
+			c.course_id=sp.course_id and 
+			stu.name like #{input}; 
+	</select>
+	
+	<select id="searchByClass" resultType="StudentPractice">
+		SELECT  
+			practice_id, stu.name as stuName, 
+			status, createtime, sp.score, 
+			p.name as programme, c.name as course
+		FROM 
+			zyyj_programme as p, zyyj_student_practice as sp, zyyj_student as stu, zyyj_course as c, zyyj_class as cls 
+		WHERE 
+			p.programme_id=sp.programme_id and 
+			stu.stu_id=sp.stu_id and 
+			c.course_id=sp.course_id and 
+			cls.class_id = stu.class_id and 
+			cls.name like #{input};
+	</select>
+</mapper>

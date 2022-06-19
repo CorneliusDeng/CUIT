@@ -1,0 +1,113 @@
+.search-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 10%;
+}
+
+.search-input {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    height: 50%;
+    border-radius: 20px;
+    background-color: #F1F1F1;
+    font-size: 20px;
+    text-align: center;
+
+}
+
+.recommend-wrapper {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    height: 90%;
+
+}
+
+.group-card {
+    width: 100%;
+    height: 20%;
+    margin-bottom: 10px;
+    background-color: #FFFFFF;
+    display: flex;
+    flex-flow: row wrap;
+    border-bottom: #d5d5d5 solid 1px;
+}
+
+
+.avatar-wrapper {
+    position: absolute;
+    left: 15%;
+}
+
+.group-name-wrapper {
+    position: absolute;
+    left: 30%;
+}
+
+.group-avatar {
+    position: relative;
+    border-radius: 0px;
+    transform: translate(-50%, 0%);
+    width: 70px;
+    height: 70px;
+    border-radius: 35px;
+}
+
+.group-name-text {
+    font-size: 20px;
+}
+
+.recommend-value {
+    position: relative;
+    left: 30%;
+}
+
+.add-group-button {
+    position: relative;
+    transform: translate(0%, -50%);
+    left: 92%;
+    top: 50%;
+}
+
+.group-tag-wrapper {
+    position: relative;
+    left: 30%;
+    top: 10%;
+    width: 90%;
+    height: 10%;
+    flex-flow: row wrap;
+    display: flex;
+}
+
+.group-tag {
+    margin-top: 5px;
+    margin-right: 2px;
+}
+
+
+.hot-wrapper {
+    position: relative;
+    left: 30%;
+    top: 20%;
+    width: 80%;
+    height: 10%;
+}
+
+.fire {
+    width: 20px;
+    height: 20px;
+}
+
+.group-description-wrapper {
+    position: relative;
+    left: 30%;
+    width: 80%;
+    word-wrap: break-word;
+}
+
+.group-description {
+    color: #a8a8a8;
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zyyj.mapper.credit.ExchangeIntegralMapper">
+
+	<!-- List<ExchangeIntegral> getAllExchangeIntegrals(); -->
+	<select id="getAllExchangeIntegrals" resultType="ExchangeIntegral">
+		select a.exchange_id, b.name as rule_name, c.name as stu_name, a.createdate, a.score, a.integral 
+		from zyyj_exchangeintegral as a, zyyj_exchangerule as b, zyyj_student as c where a.rule_id=b.rule_id and a.stu_id=c.stu_id;
+	</select>
+	
+	<!-- searchByStudent(String stuName) -->
+	<select id="searchByStudent" resultType="ExchangeIntegral">
+		select a.exchange_id, b.name as rule_name, c.name as stu_name, a.createdate, a.score, a.integral 
+		from zyyj_exchangeintegral as a, zyyj_exchangerule as b, zyyj_student as c where a.rule_id=b.rule_id and a.stu_id=c.stu_id and c.name like #{stuName};
+	</select>
+	
+	<!-- searchByClass(String className) -->
+	<select id="searchByClass" resultType="ExchangeIntegral">
+		select a.exchange_id, b.name as rule_name, c.name as stu_name, a.createdate, a.score, a.integral 
+		from zyyj_exchangeintegral as a, zyyj_exchangerule as b, zyyj_student as c where a.rule_id=b.rule_id and a.stu_id=c.stu_id and c.class_id = 
+			(select class_id from zyyj_class where name like #{className});
+	</select>
+	
+	<!--  searchByExchangeRule(String rule) -->
+	<select id="searchByExchangeRule" resultType="ExchangeIntegral">
+		select a.exchange_id, b.name as rule_name, c.name as stu_name, a.createdate, a.score, a.integral 
+		from zyyj_exchangeintegral as a, zyyj_exchangerule as b, zyyj_student as c where a.rule_id=b.rule_id and a.stu_id=c.stu_id and b.name like #{rule};
+	</select>
+</mapper>

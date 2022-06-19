@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>群聊查看</title>
+	<link rel="stylesheet" href="css/layui/css/layui.css">
+	<script src="js/layui/layui.js"></script>
+	<script src="js/jquery/jquery-3.3.1.min.js"></script>
+	<script src="js/jquery/jquery.validate.min.js"></script>
+	<script src="js/jquery/jquery.validate.extend.js"></script>
+	
+	<style type="text/css">
+	
+		.layui-table-cell{
+		
+			text-align:center;
+		
+			height: auto;
+		
+			white-space: normal;
+		
+		}
+		
+		.layui-table img{
+		
+			max-width:50px
+		
+		}
+	</style>
+</head>
+
+<body>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+	<input type="text" style="height:30px;width:200px;" name="groupId" id="groupId" placeholder="输入id">
+	<button type="button" id="do_search" class="layui-icon layui-icon-search layui-btn layui-btn layui-btn-xs layui-btn-radius">查询</button>
+</script>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'http://101.132.145.179:8888/dateornot/Group/Query'
+			,method:'post'
+			,page: true
+			, limit: 5
+			, limits: [5,10,20]
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,title: '群聊数据表'
+            ,cols: [[
+				{field:'group_id', title:'群ID', width:140, sort: true}
+               ,{field:'group_name', title:'群名', width:200}
+               ,{field:'owner_id', title:'群主ID', width:100}
+               ,{field:'member_count', title:'成员数', width:100}
+               ,{field:'create_time', title:'创建时间', width:200, sort: true}
+               ,{field:'description', title:'群简介', width:240}
+               ,{field:'status', title:'状态', width:100,templet: function(row) {
+		                if (row.status == 0) {
+		                    return "正常"
+		                } else if (row.status == 1) {
+		                    return "违规"
+		                }else if (row.status ==null){
+		                	return "未知"
+		                }
+		            }}
+               ,{field:'head_image_url', title:'群头像', width:240,templet:'<div><img  src="{{ d.head_image_url }}"></div>'}
+            ]]
+        });
+		
+		// 执行搜索，表格重载
+		    $('body').on('click', '#do_search',function () {
+		      // 搜索条件
+		      var groupId = $('#groupId').val();
+		      table.reload('test', {
+				url: 'http://101.132.145.179:8888/dateornot/Group/Detail'
+		        ,where: {
+		          'id': groupId,
+		        }
+		        , page: {
+		          curr: 1
+		        }
+		      });
+		    });
+    });
+</script>
+</body>
+</html>

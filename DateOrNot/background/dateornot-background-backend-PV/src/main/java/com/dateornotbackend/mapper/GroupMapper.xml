@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dateornotbackend.mapper.GroupMapper">
+
+    <insert id="CreateGroup" keyProperty="group_id" useGeneratedKeys="true" parameterType="com.dateornotbackend.entity.Group">
+        insert into GroupChat(group_name,owner_id,member_count,create_time,description, status, head_image_url)
+        values(#{group_name}, #{owner_id}, #{member_count}, STR_TO_DATE(#{create_time}, "%Y-%m-%d"), #{description},  #{status}, #{head_image_url})
+    </insert>
+
+    <delete id="DeleteGroup">
+        delete from GroupChat where group_id = #{group_id}
+    </delete>
+
+    <update id="UpdateGroup" parameterType="com.dateornotbackend.entity.Group">
+        update GroupChat set status = #{status}
+        where group_id = #{group_id}
+    </update>
+
+    <select id="QueryGroup" resultType="com.dateornotbackend.entity.Group">
+        select * from GroupChat
+    </select>
+
+
+    <select id="DetailGroup" resultType="com.dateornotbackend.entity.Group">
+        select * from GroupChat where group_id = #{group_id}
+    </select>
+
+    <select id="GroupId" resultType="java.lang.Integer">
+        select group_id from GroupChat where group_name = #{group_name} and owner_id = #{owner_id}
+    </select>
+
+</mapper>

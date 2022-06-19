@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title></title>
+	<!-- 微信 JS-SDK  -->
+	<script type="text/javascript" src="//res.wx.qq.com/open/js/jweixin-1.4.0.js"></script> 
+	<!-- uni 的 SDK -->
+	<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+	<!-- vue开发环境版本，包含了有帮助的命令行警告 -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+	<div class="status_bar"><!-- 状态栏 --></div>
+	<!-- 自定义导航栏 -->
+	<div class="status_title">
+	    <image class="status_left" src="../../static/images/message/back.png"  mode="widthFix"></image>
+	    <div class="status_center">文件传输</div>
+	    <image class="status_right" src="../../static/images/message/patch.png"  mode="widthFix"></image>
+	</div>
+	<div id="main">
+		<div class="notice" v-if="nowTransFile!=''">正在传输:</div>
+		<div v-if="nowTransFile!=''" class="fileList">
+			<image class="fileIcon" src="../../static/images/message/file2.png"></image>
+			<a class="fileName" >{{nowTransFile.fileName}}</a>
+		</div>
+		<div class="notice" v-if="waitFileList.length>0">待传输列表:</div>
+		<div class="fileList" v-for="(item,index) in waitFileList" :key="index" :id="'waitFile'+index">
+			<image class="fileIcon" src="../../static/images/message/file2.png"></image>
+			<a class="fileName" :download="item.file.name" :href="item.href">{{item.file.name}}</a>
+		</div>
+		<div class="notice" v-if="overFileList.length>0">已完成:</div>
+		<div class="fileList" v-for="(item,index) in overFileList" :key="index" :id="'overFile'+index">
+			<image class="fileIcon" src="../../static/images/message/file2.png"></image>
+			<a class="fileName" :download="item.file.name" :href="item.href">{{item.file.name}}</a>
+		</div>
+		
+	</div>
+	
+	
+	<input class="fileInput" type="file" />
+	<image class="fileUpBtn" src="../../static/images/message/fileUp.png" ></image>
+	
+	
+	
+	<script>
+		new Vue({
+			el:'#main',
+			data:{
+				href:"../../static/images/message/file.png",
+				waitFileList:[],	//待发送文件列表
+				overFileList:[],		//已发送文件列表
+				nowTransFile:'',		//正在发送的文件
+				isApp:false,	//运行环境是否是app
+				socketTask:null,		//websocket实体
+				socketIsOpen:false,		//websocket是否打开
+				socketUrl:"ws://119.23.49.121:8081/ws?uid=",	//websocket服务器url
+				
+				webRTCisOpen:false,		//webRTC是否打开
+				peer:'',				//webRTC实体
+				fileChannel:'',			//文件传输通道实体
+				fileInfo:'',			//文件信息
+				fileData:'',			//文件数据流
+				receivedLength:0,		//已接收文件长度
+				isControlMsg: true,		//当前消息是否是控制消息
+			},
+			mounted() {
+				//初始化页面数据
+				this.init();
+				//初始化webrtc
+				this.peerConnectionInit();
+				// //初始化websocket
+				this.WebSocketInit();
+			},
+			beforeDestroy() {
+				//关闭websocket
+				this.socketTask.close();
+				this.freeResource(); //释放资源
+			},
+			watch:{
+				socketIsOpen(val){
+					if(val==true&&this.webRTCisOpen==false){
+						if(this.target==='offer'){
+							console.log("开始连接");
+							this.startLive();
+						}else if(this.target==='answer'){
+							console.log("发起文件请求");
+							this.sendMessage("【请求发送文件】");
+						}
+					}
+				}
+			},
+			methods:{
+				//页面初始化
+				init:function(){
+					this.agent = this.urlParamGet(window.location.href);
+					console.log(this.agent);
+					this.target = this.agent.type;
+					if(Number(this.agent.uid)<=8000000){
+						this.agent.uid = Number(this.agent.uid)+8000000;
+					}
+					this.socketIsOpen = false;
+					this.socketUrl = this.socketUrl+this.agent.uid;
+					console.log(this.socketUrl);
+					let that = this;
+					// 待触发 `UniAppJSBridgeReady` 事件后，即可调用 uni 的 API。
+					document.addEventListener('UniAppJSBridgeReady', function() {
+					    uni.postMessage({
+					        data: {
+					            action: 'message',
+					        }
+					    });
+						uni.getEnv(function(res) {  
+						    if (res.plus) {
+						        console.log('当前环境为【5+App】');
+								res.plus.runtime.openWeb("https://blog.csdn.net/ihtml5/article/details/102924571");
+								that.isApp = true;
+						    } else if (res.miniprogram) {  
+						        console.log('当前环境为【微信小程序】');  
+								that.isApp = false;
+						    } 
+						});  
+						console.log("uni加载完成")
+					});
+					
+				
+					
+					// //绑定发送事件
+					// document.querySelector('.fileUpBtn').addEventListener('click', function(evt){
+					// 	that.fileUp();
+					// });
+					//调用文件发送处理
+					document.querySelector('.fileInput').addEventListener('change', function(evt){
+						console.log(evt.target.files[0])
+						that.fileUpMange(evt.target.files[0]);
+					});
+				},
+				//建立websocket连接
+				WebSocketInit:function(){
+					console.log("尝试建立websocket连接");
+					//防止重复连接
+					if(this.socketIsOpen){return}
+					//连接websocket
+					this.socketTask = new WebSocket(this.socketUrl);
+					//监听开启
+					this.socketTask.onopen=()=>{
+						console.log("websocket已连接");
+						this.socketIsOpen = true;
+					};
+					//监听关闭
+					this.socketTask.onclose=()=>{
+						console.log("连接已关闭");
+						this.socketIsOpen = false;
+					};					
+					//监听错误
+					this.socketTask.onerror=()=>{
+						console.log("出错了");
+						this.socketIsOpen = false;
+					};					
+					//监听消息
+					this.socketTask.onmessage=(e)=>{
+						let msg = JSON.parse(e.data).msg;
+						console.log('文件传输客户端收到：'+msg);
+						if(msg=="【拒绝文件请求】"){
+							this.closeChat();	//调用结束处理
+						}else{
+							this.handShake(msg);	//调用握手处理
+						}
+					};
+				},
+				//初始化p2p连接
+				peerConnectionInit:function(){
+					const PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+					this.peer = new PeerConnection();
+					console.log('peer初始化成功');
+					//监听候选者
+					this.peer.onicecandidate = e => {
+						if (e.candidate) {
+							console.log('搜集并发送候选人');
+							this.sendMessage(JSON.stringify({
+								type: this.target+`_ice`,
+								iceCandidate: e.candidate
+							}));
+						} else {
+							console.log('候选人收集完成！');
+						}
+					};
+					if(this.target=="offer"){
+						console.log('fileChannel初始化成功');
+						this.fileChannel = this.peer.createDataChannel("fileChannel");
+						console.log('fileChannel初始化成功');
+						this.fileChannel.onopen = ()=>{
+							console.log("file通道已打开");
+							// this.fileChannel.send("hello dataChannel!!");
+						};
+						this.fileChannel.onclose = ()=>{
+							console.log("file通道已关闭");
+						};
+						this.fileChannel.onmessage = (e)=>{
+							this.receivedMessage(e.data);
+							// console.log(e.message);
+						}
+					};
+					//接收通道处理
+					this.peer.ondatachannel = this.receiveChannelCallback;
+				},
+				//发送消息
+				sendMessage:function(mes){
+					let data = {
+						senderId: this.agent.uid, //用户id
+						senderName: this.agent.uname,
+						senderUrl: this.agent.headUrl,
+						accepterId: this.agent.accepter,
+						msg: mes,
+						isChat: false,
+						type: 'fileOnline',
+						time: new Date(),
+					};
+					if(Number(this.agent.accepter)<=8000000){
+						this.agent.accepter = Number(this.agent.accepter)+8000000;
+					}
+					data = JSON.stringify(data);
+					console.log("尝试发送消息："+data);
+					if(this.socketIsOpen){
+						this.socketTask.send(data);
+					}
+				},
+				//处理url参数
+				urlParamGet:function(url){
+					 //去掉？,解码特殊字符
+					var arr= decodeURIComponent(url.split("?")[1]) ;
+					//根据“&”分割字符串
+					arr=arr.split("&");
+					//定义空的params，保存对象
+					var params={};
+					//循环遍历分割后的数组         
+					for(var p of arr){
+					   //根据“=”分割
+					  var arr2=p.split("=");
+					  //解构
+					  var [name,value]=arr2;
+					  //如果params中的name为undefined就把值填进去
+					  if(params[name]==undefined){
+					      params[name]=value;
+					  }
+					}
+					console.log(JSON.stringify(params));
+					return params;         
+				},
+				//文件发送管理
+				fileUpMange:function(file){
+					if(this.nowTransFile==''){
+						//当前没有正在发送的文件就发送
+						this.fileUp(file);
+					}else{
+						//否则加入等待队列
+						let fileMsg = {};
+						fileMsg.href = URL.createObjectURL(file);
+						fileMsg.file = file;
+						this.waitFileList.push(fileMsg);
+					}
+				},
+				//文件发送
+				fileUp:function(fileT){
+					let file = fileT;
+					const CHUNK_LIMIT = 1200;	//文件分块大小
+					let chunkNum = 0;	//当前块数
+					let reader = new FileReader();	//文件读取工具对象
+					let fileMsg = {			//文件信息简介
+						fileName:file.name,
+						fileSize:file.size,
+						fileType:file.type
+					};
+					this.nowTransFile = fileMsg;	//记录当前发送文件
+					console.log("文件发送")
+					//数据读取成功就发送并读下一个文件块
+					reader.onload = e =>{
+						// console.log(e.target.result);  // 文件数据流
+						if(this.fileChannel!=''){
+							this.fileChannel.send(e.target.result);
+							chunkNum++;
+							
+							if(chunkNum*CHUNK_LIMIT < file.size){
+								// console.log('发送第'+chunkNum+'个文件分块');
+								readNextChunk();
+							}else{
+								console.log('发送完毕');
+								this.nowTransFile = '';
+								this.overFileManage(file);	//文件传输结束管理
+								
+								if(this.waitFileList.length!=0){
+									console.log(this.waitFileList);
+									//发送下一个
+									this.fileUp(this.waitFileList.shift().file);
+								}
+							}
+						}
+					};
+					//读取并发送下一个文件块
+					function readNextChunk(){
+						let start = CHUNK_LIMIT*chunkNum;
+						let end = Math.min(file.size,start+CHUNK_LIMIT);
+						reader.readAsArrayBuffer(file.slice(start,end));	//读取文件对应块
+					}
+					
+					//通道存在就开始发送
+					if(this.fileChannel!=''){
+						console.log("文件发送通道已连接，开始发送")
+						this.fileChannel.send(JSON.stringify(fileMsg))
+						readNextChunk();
+					}	
+				},
+				//已发送文件管理
+				overFileManage:function(file){
+					console.log(file);
+					let fileMsg = {};
+					fileMsg.href = URL.createObjectURL(file);
+					fileMsg.file = file;
+					this.overFileList.unshift(fileMsg);
+				},
+				//握手处理
+				async handShake(msg){
+					let { type, sdp, iceCandidate } = JSON.parse(msg)
+					if (type === 'answer') {
+						console.log("收到answer");
+						this.webRTCisOpen = true;
+						await this.peer.setRemoteDescription(new RTCSessionDescription({ type, sdp }));
+						console.log("this.peer.RemoteDescription",this.peer.remoteDescription)
+					} else if (type === 'answer_ice') {
+						console.log("收到answer_ice");
+						this.peer.addIceCandidate(iceCandidate);
+					} else if (type === 'offer') {
+						console.log("收到offer");
+						this.webRTCisOpen = true;
+						this.startLive(new RTCSessionDescription({ type, sdp }));
+					} else if (type === 'offer_ice') {
+						console.log("收到offer_ice");
+						this.peer.addIceCandidate(iceCandidate);
+					}
+				},
+				//开始连接webRTC
+				async startLive(sdp){
+					if (!sdp) {
+						console.log('创建本地SDP');
+						console.log(this.peer);
+						let offer = await this.peer.createOffer();
+						await this.peer.setLocalDescription(offer);
+						console.log("this.peer.LocalDescription",this.peer.localDescription)
+						console.log(`传输发起方本地SDP`);
+						this.sendMessage(JSON.stringify(offer));
+					} else {
+						console.log('接收到发送方SDP');
+						console.log(this.peer);
+						await this.peer.setRemoteDescription(sdp);
+						
+						console.log("this.peer.RemoteDescription",this.peer.remoteDescription)
+						console.log('创建接收方（应答）SDP');
+						let answer = await this.peer.createAnswer();
+						console.log(`传输接收方（应答）SDP`);
+						this.sendMessage(JSON.stringify(answer));
+						await this.peer.setLocalDescription(answer);
+						console.log("this.peer.LocalDescription",this.peer.localDescription)
+					}
+				},
+				//接收通道处理
+				receiveChannelCallback:function(event){
+					this.fileChannel = event.channel;
+					this.fileChannel.onmessage = (e)=>{
+						// console.log(e.data);
+						this.receivedMessage(e.data);
+					};
+					this.fileChannel.onopen = ()=>{
+						console.log("file通道已连接");
+					};
+					this.fileChannel.onclose = ()=>{
+						console.log("file通道已关闭");
+					};    
+				},
+				//接收到的消息处理
+				receivedMessage:function(msg){
+					if(this.isControlMsg){
+						//控制消息处理
+						this.fileInfo = JSON.parse(msg);
+						this.fileData = [];
+						this.receivedLength = 0;
+						this.isControlMsg = false;
+						console.log("接收到文件："+this.fileInfo.fileName)
+						this.nowTransFile = this.fileInfo;
+					}else{
+						//数据接收处理
+						this.receivedLength += msg.byteLength;
+						this.fileData.push(msg);
+						// console.log("接收进度："+(this.receivedLength/this.fileInfo.fileSize));
+						if(this.receivedLength == this.fileInfo.fileSize){
+							//接收完毕将文件处理后存入数组中
+							console.log("接收完毕");
+							let fileMain = new File(this.fileData,this.fileInfo.fileName,{type: this.fileInfo.fileType});
+							this.isControlMsg = true;
+							this.nowTransFile = '';
+							this.overFileManage(fileMain);
+						}
+					}
+				},
+				//结束传输，页面返回处理
+				closeChat:function(){
+					if(Number(this.agent.accepter)>8000000){
+						this.agent.accepter = Number(this.agent.accepter)-8000000;
+					}
+					console.log('返回到：/pages/message/friendChat?id='+this.agent.accepter);
+					uni.navigateTo({
+					    url: '/pages/message/friendChat?id='+this.agent.accepter
+					});	
+					this.freeResource(); //释放资源	
+				},
+				//资源释放处理
+				freeResource:function(){
+					//关闭websocket连接
+					if(this.socketIsOpen){
+						this.socketIsOpen = false;
+						this.socketTask.close();
+					}
+					//释放数据通路
+					if(this.fileChannel!=''){
+						this.fileChannel.close();
+						this.fileChannel = '';
+					}
+					//释放webRTC连接
+					if(''!=this.peer){
+						this.peer.close();
+						this.peer = '';
+					}
+				}
+			}
+		})
+	</script>
+	<style lang="scss">
+		page {
+			height: 100%;
+		}
+		
+		.body{
+			height: 100%;
+			background: rgba(244, 244, 244, 1);
+		}
+		.status_bar {
+		    height: 25px;
+		    width: 100%;      
+		}
+		 
+		/* 自定义导航栏 */
+		.status_title {
+			background: rgba(244, 244, 244,  0.96);
+			border-bottom: 1rpx solid rgba(39, 40, 50, 0.1);
+		    box-sizing: border-box;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    width: 100%;
+		    height: 44px;
+		    padding: 0 16px;
+			border-radius: 25px;
+		}
+		.status_left {
+		    width: 22px ;
+			font-size: 18px;
+			font-weight: 700;
+		}
+		.status_center {
+		    font-size: 18px;
+		    font-weight: 700;
+		}
+		.status_right {
+		    width: 22px;
+		}
+		/*文件列表*/
+		.fileList{
+			margin-top: 10px;
+			background: rgba(244, 244, 244,  0.96);
+			border-bottom: 1rpx solid rgba(39, 40, 50, 0.1);
+			box-sizing: border-box;
+			display: flex;
+			font-size: 18px;
+			font-weight: 500;
+			align-items: center;
+			width: 100%;
+			/* height: 80px; */
+			padding: 5px 16px;
+			border-radius: 25px;
+		}
+		.main{
+			overflow-y:scroll;
+		}
+		/* 文件图标 */
+		.fileIcon{
+			width: 60px;
+		}
+		/* 文件名链接 */
+		.fileName{
+			text-decoration : none;
+			margin-left: 10px;
+		}	
+		/* 进度通知栏 */
+		.notice{
+			margin-top: 5px;
+			margin-left: 10px;
+			font-size: 15px;
+			color: #808080;
+		}
+		/* 上传文件控件 */
+		.fileInput{
+			position: absolute;
+			left: 40%;
+			bottom: 10%;
+			width: 20%;
+			height: 8%;
+			z-index: 999;
+			opacity: 0;
+		}
+		/* 上传文件图标 */
+		.fileUpBtn{
+			position: absolute;
+			left: 40%;
+			bottom: 10%;
+			width: 20%;
+			z-index: 997;
+		}
+	</style>
+
+</body>

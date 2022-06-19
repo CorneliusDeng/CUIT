@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>主页</title>
+	<link rel="stylesheet" href="css/layui/css/layui.css">
+	<script src="js/layui/layui.js"></script>
+	<script src="js/jquery/jquery-3.3.1.min.js"></script>
+	<script src="js/jquery/jquery.validate.min.js"></script>
+	<script src="js/jquery/jquery.validate.extend.js"></script>
+</head>
+
+<body>
+
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">约了吗校园交友平台</div>
+        <!-- 头部导航 -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="img/me.jpg" class="layui-nav-img">
+                    我的
+                </a>
+            </li>
+            <li class="layui-nav-item"><a href="login.html">退出登录</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scrolln">
+            <!-- 左侧导航 -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+				<li class="layui-nav-item"> 
+					<a>群聊管理</a>
+				    <dl class="layui-nav-child">
+				      <dd>
+				        <a id="group" href="group.html">群聊查看</a>
+				      </dd>
+				    </dl>
+					<dl class="layui-nav-child">
+					  <dd>
+					    <a id="groupApplyCheck" href="groupApplyCheck.html">群聊申请审核</a>
+					  </dd>
+					</dl>
+					<dl class="layui-nav-child">
+					  <dd>
+					    <a id="groupWarnCheck" href="groupWarnCheck.html">群聊举报审核</a>
+					  </dd>
+					</dl>
+				</li>
+                <li class="layui-nav-item">
+                    <a id="user" href="user.html">用户管理</a>
+                </li>
+                <li class="layui-nav-item">
+                	<a>动态管理</a>
+					<dl class="layui-nav-child">
+					  <dd>
+					    <a id="moment" href="moment.html">动态查看</a>
+					  </dd>
+					</dl>
+                    <dl class="layui-nav-child">
+                      <dd>
+                        <a id="momentApply" href="momentApply.html">动态发布审核</a>
+                      </dd>
+                    </dl>
+                	<dl class="layui-nav-child">
+                	  <dd>
+                	    <a id="momentCheck" href="momentCheck.html">动态举报审核</a>
+                	  </dd>
+                	</dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a id="log" href="log.html">日志管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 主体 -->
+        <iframe id="iframeMain" src="" style="width: 100%;height: 100%"></iframe>
+    </div>
+
+</div>
+
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+
+    $(document).ready(function(){
+        $("#user").click(function (e) {
+            e.preventDefault();
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+    $(document).ready(function(){
+        $("#group").click(function (e) {
+            e.preventDefault(); //  设置点击事件不跳转到另一个页面
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+    $(document).ready(function(){
+        $("#log").click(function (e) {
+            e.preventDefault();
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+    $(document).ready(function(){
+        $("#moment").click(function (e) {
+            e.preventDefault();
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+	$(document).ready(function(){
+	    $("#momentApply").click(function (e) {
+	        e.preventDefault();
+	        $("#iframeMain").attr("src",$(this).attr("href"));
+	    });
+	});
+	
+    $(document).ready(function(){
+        $("#groupApplyCheck").click(function (e) {
+            e.preventDefault();
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+    $(document).ready(function(){
+        $("#momentCheck").click(function (e) {
+            e.preventDefault();
+            $("#iframeMain").attr("src",$(this).attr("href"));
+        });
+    });
+	
+	$(document).ready(function(){
+	    $("#groupWarnCheck").click(function (e) {
+	        e.preventDefault();
+	        $("#iframeMain").attr("src",$(this).attr("href"));
+	    });
+	});
+	
+</script>
+
+</body>
+</html>

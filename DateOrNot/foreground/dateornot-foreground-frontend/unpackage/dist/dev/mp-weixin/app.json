@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/matching/matching",
+    "pages/discover/discover",
+    "pages/findGroup/findGroup",
+    "pages/addGroup/addGroup",
+    "pages/nearbyPeople/nearbyPeople",
+    "pages/matchedUserInfo/matchedUserInfo"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap40.json"
+}

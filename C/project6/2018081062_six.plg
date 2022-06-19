@@ -1,0 +1,29 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: 2018081062_six - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Users\CorneliusDeng\AppData\Local\Temp\RSPB3B4.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/2018081062_six.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\Csourcecode\project6\2018081062_six.c"
+]
+Creating command line "cl.exe @C:\Users\CorneliusDeng\AppData\Local\Temp\RSPB3B4.tmp" 
+<h3>Output Window</h3>
+Compiling...
+2018081062_six.c
+D:\Csourcecode\project6\2018081062_six.c(258) : warning C4047: 'function' : 'int *' differs in levels of indirection from 'int '
+D:\Csourcecode\project6\2018081062_six.c(258) : warning C4024: 'ReverseArray' : different types for formal and actual parameter 1
+D:\Csourcecode\project6\2018081062_six.c(176) : warning C4716: 'swapChar' : must return a value
+D:\Csourcecode\project6\2018081062_six.c(258) : warning C4700: local variable 'Array' used without having been initialized
+
+
+
+<h3>Results</h3>
+2018081062_six.obj - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
